@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: FIAP Tech Challenge - Fase 4 - Follow-up Microservice
+  title: FIAP 2023 - Pós Tech - Tech Callenge - Fase 4 - Follow-up Microservice
   version: 1.0.0
 servers:
   - url: http://localhost:8080
