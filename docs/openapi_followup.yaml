@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: FIAP Tech Challenge - Fase 4 - Follow-up Microservice
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /followup/order:
+    put:
+      tags:
+        - Follow-up
+      summary: Change the status of an order
+      operationId: _DEFINIR_
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/requestOrderStatus'
+      responses:
+        '200':
+          $ref: '#/components/requestBodies/200orderStatus'
+        '400':
+          $ref: '#/components/requestBodies/400orderStatus'
+        '500':
+          $ref: '#/components/requestBodies/500orderStatus'
+    get:
+      tags:
+        - Follow-up
+      summary: Returns all active orders to show in monitoring panel
+      operationId: _DEFINIR_
+      responses:
+        '200':
+          $ref: '#/components/requestBodies/200orderStatusList'
+        '400':
+          $ref: '#/components/requestBodies/400Standard' 
+        '500':
+          $ref: '#/components/requestBodies/500Standard'
+
+components:
+  schemas:
+    orderStatusObject:
+      type: object
+      properties:
+        orderId:
+          type: integer
+          example: 100
+        status:
+          type: string
+          enum:
+          - RECEIVED
+          - PRODUCTION
+          - READY
+          - FINISHED
+          example: 'RECEIVED'
+
+  requestBodies:
+    requestOrderStatus:
+      description: 'Change order status'
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: '#/components/schemas/orderStatusObject'
+
+    200orderStatus:
+      description: 'Order status changed'
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/orderStatusObject'
+            - type: object
+            properties:      
+              message:
+                type: string
+                example: 'order status updated'
+
+    400orderStatus:
+      description: 'Bad Request'
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/orderStatusObject'
+            - type: object
+            properties:      
+              message:
+                type: string
+                example: '<<request error description>>'
+
+    500orderStatus:
+      description: 'Internal Server Error'
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/orderStatusObject'
+            - type: object
+            properties:      
+              message:
+                type: string
+                example: '<<application error description>>' 
+
+    200orderStatusList:
+      description: 'List of active orders'
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              allOf:
+              - $ref: '#/components/schemas/orderStatusObject'
+              - type: object
+              properties:      
+                createdAt:
+                  type: string
+                  format: date
+
+    400Standard:
+      description: 'Bad Request'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: '<<request error description>>'
+
+    500Standard:
+      description: 'Internal Server Error'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: '<<application error description>>'
+
