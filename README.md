@@ -38,6 +38,7 @@ Deve ter alta capacidade de recuperação e disponibilização das informações
 
 ### API:
 [Documentação Open API da API do subsistema de Acompanhamento](./docs/openapi_followup.yaml "Open API").
+- melhor visualizado com o Visual Studio Code + OpenAPI Editor Plugin
 
 ### Diagrama simplificado da arquitetura
-![Subsistema de Acompanhamento de Pedidos](./docs/img/arquitetura_followup.png "Follow Up Subsystem")
+![Subsistema de Acompanhamento de Pedidos](./docs/img/arquitetura_followup.jpg "Follow Up Subsystem")
