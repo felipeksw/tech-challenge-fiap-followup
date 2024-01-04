@@ -41,4 +41,4 @@ Deve ter alta capacidade de recuperação e disponibilização das informações
 - melhor visualizado com o Visual Studio Code + OpenAPI Editor Plugin
 
 ### Diagrama simplificado da arquitetura
-![Subsistema de Acompanhamento de Pedidos](./docs/img/arquitetura_followup.png "Follow Up Subsystem")
+![Subsistema de Acompanhamento de Pedidos](./docs/img/arquitetura_followup.jpg "Follow Up Subsystem")
