@@ -13,6 +13,8 @@ O subsistema de Acompanhamento é passivo no fluxo da aplicação e não tem ló
 
 Deve ter alta capacidade de recuperação e disponibilização das informações dos pedidos, uma vez que o front-end tem a meta de realizar a atualização das informações no monitor para o cliente com no máximo 8 segundos de atraso em relação a efetivação da alteração do status de um pedido
 
+---
+
 ### Requisitos
 - Ao ser inicializado o subsistema de acompanhamento deve recuperar todos os pedidos que não estejam com o status Finalizado do banco de dados relacional e deve carrega-los no banco de dados não relacional do tipo chave-valor.
     - chave = pedido
@@ -36,9 +38,28 @@ Deve ter alta capacidade de recuperação e disponibilização das informações
 - Caso a “request” não encontre nenhum registro, deve retornar um código http 200 com uma lista vazia
 - Caso ocorra um erro ao processar a recuperação da lista, o subsistema deve retornar um código http 500 com a mensagem de erro
 
+---
+
 ### API:
 [Documentação Open API da API do subsistema de Acompanhamento](./docs/openapi_followup.yaml "Open API").
 - melhor visualizado com o Visual Studio Code + OpenAPI Editor Plugin
 
+---
+
 ### Diagrama simplificado da arquitetura
 ![Subsistema de Acompanhamento de Pedidos](./docs/img/arquitetura_followup.jpg "Follow Up Subsystem")
+
+---
+
+### Entregáveis
+Dando continuidade ao desenvolvimento do software para a lanchonete, teremos as seguintes melhorias e alterações:
+- [ ] Refatore o projeto separando em ao menos 3 microsserviços:
+    - ~~Pedido: responsável por retornar as informações necessárias para montar um pedido.~~
+    - ~~Pagamento: responsável por realizar a cobrança de um pedido gerado anteriormente.~~
+    - **Produção**: responsável por acompanhar a produção/fila de pedidos e atualização de status.
+- [ ] Lembre-se de trabalhar com bancos de dados para cada aplicação. Use ao menos um banco de dados NoSQL e um SQL; caso queira fazer com mais bancos, você pode decidir quais utilizar. 
+- [ ] Ao refatorar, os microsserviços devem conter testes unitários usando BDD com no mínimo 80% de cobertura de testes por cada microsserviço.
+- [x] Seus repositórios devem ser separados para cada aplicação e devem respeitar as seguintes regras:
+    - [x] Main protegida.
+    - [ ] PR para branch main deve validar o build da aplicação, e qualidade de código via sonarqube.
+    - [ ] Automatize o deploy dos seus microsserviços.
