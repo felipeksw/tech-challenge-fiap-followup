@@ -1,4 +1,4 @@
-package com.fiap.techchallenge.followup.presentation;
+package com.fiap.techchallenge.followup.presentation.controllers;
 
 import java.util.Map;
 
