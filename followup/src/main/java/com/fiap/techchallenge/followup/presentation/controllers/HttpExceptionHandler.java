@@ -12,7 +12,7 @@ public class HttpExceptionHandler {
 
     @ExceptionHandler(BaseHttpException.class)
     public ResponseEntity<ErrorResponseDto> handleHttpException(BaseHttpException e) {
-        return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponseDto(e.getMessage()));
+        return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponseDto(e.getRequestData(), e.getMessage()));
     }
 
 }

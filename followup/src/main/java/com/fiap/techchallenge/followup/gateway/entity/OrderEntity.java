@@ -55,4 +55,12 @@ public class OrderEntity {
                 .build();
     }
 
+    public static OrderEntity fromDomain(Order order) {
+        return OrderEntity.builder()
+                .id(order.id())
+                .status(order.status().value())
+                .createdAt(order.createdAt())
+                .build();
+    }
+
 }

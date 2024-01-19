@@ -44,7 +44,10 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Nenhum pedido encontrado", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
             }),
-            @ApiResponse(responseCode = "422", description = "Dados inválidos para a atualização do status", content = {
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para a atualização do status", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Problemas internos durante a a atualização do status", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
             })
     })
@@ -60,10 +63,7 @@ public class OrderController {
             @ApiResponse(responseCode = "200", description = "Status atualizado", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Nenhum pedido encontrado", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "422", description = "Dados inválidos para a atualização do status", content = {
+            @ApiResponse(responseCode = "500", description = "Problemas internos durante a recuperação das ordens ativas", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
             })
     })

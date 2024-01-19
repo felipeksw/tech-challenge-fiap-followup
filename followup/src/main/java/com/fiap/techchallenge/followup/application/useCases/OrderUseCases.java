@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import com.fiap.techchallenge.followup.application.services.OrderService;
 import com.fiap.techchallenge.followup.domain.Order;
 import com.fiap.techchallenge.followup.domain.Status;
-import com.fiap.techchallenge.followup.domain.exceptions.DataInputException;
+import com.fiap.techchallenge.followup.domain.exceptions.BadRequestException;
+import com.fiap.techchallenge.followup.domain.exceptions.InternalServerErrorException;
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.domain.exceptions.ResourceNotFoundException;
@@ -28,8 +29,8 @@ public class OrderUseCases {
         try {
             List<Order> orders = orderService.findAllWithActiveStatus();
             return orders.stream().map(x -> OrderDto.of(x)).collect(Collectors.toList());
-        } catch (NotFoundException ex) {
-            throw new ResourceNotFoundException(ex.getMessage());
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 
@@ -39,9 +40,11 @@ public class OrderUseCases {
                     new Status(updateStatusResquest.getStatus()));
             return OrderUpdateStatusResponseDto.of(order, "order status updated");
         } catch (NotFoundException e) {
-            throw new ResourceNotFoundException(e.getMessage());
+            throw new ResourceNotFoundException(e.getMessage(), updateStatusResquest);
         } catch (InvalidDataException e) {
-            throw new DataInputException(e.getMessage());
+            throw new BadRequestException(e.getMessage(), updateStatusResquest);
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage(), updateStatusResquest);
         }
     }
 
