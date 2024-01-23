@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,5 +72,20 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<OrderDto>> findAllOrdersWithStatusActive() {
         return ResponseEntity.status(HttpStatus.OK).body(orderUseCases.findAllWithActiveStatus());
+    }
+
+    @Operation(summary = "Atualiza o cache com as ordens que possuem status ativo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cache atualizado", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Problemas internos durante a atualização do cache", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
+            })
+    })
+    @PostMapping(value = "/refresh-cache")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> refreshOrderStatusCache() {
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -48,4 +48,13 @@ public class OrderUseCases {
         }
     }
 
+    public void refreshOrderStatusCache() {
+        try {
+            orderService.initializeOrderActiveStatusCache();
+
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
 }

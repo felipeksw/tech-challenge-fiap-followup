@@ -19,6 +19,20 @@ services:
     networks:
       - app_network
 
+  followup-application:
+    container_name: followup-application
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: followup-application:latest
+    depends_on:
+      - redis
+      - database
+    ports:
+      - 8080:8080
+    networks:
+      - app_network
+
 networks:
   app_network:
     driver: bridge

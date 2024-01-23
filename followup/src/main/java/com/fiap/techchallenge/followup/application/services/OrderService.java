@@ -10,4 +10,6 @@ public interface OrderService {
     List<Order> findAllWithActiveStatus();
 
     Order updateStatus(Long id, Status newStatus);
+
+    void initializeOrderActiveStatusCache();
 }

@@ -33,25 +33,21 @@ import com.fiap.techchallenge.followup.domain.Status;
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.gateway.entity.OrderEntity;
+import com.fiap.techchallenge.followup.gateway.port.CachePort;
 import com.fiap.techchallenge.followup.gateway.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
     private final OrderRepository orderRepository;
 
-    @Autowired
-    private final CacheManager cacheManager;
+    private final CachePort cachePort;
 
-    @Autowired
-    private final RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
     private final ObjectMapper objectMapper;
 
     private final String ORDER_STATUS_CACHE_PREFIX_KEY = "orderStatus::";
@@ -59,8 +55,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findAllWithActiveStatus() {
 
-        Set<String> orderStatusKeys = redisTemplate.keys(ORDER_STATUS_CACHE_PREFIX_KEY + "*");
-        List<Order> ordersWithActiveStatus = (List<Order>) redisTemplate.opsForValue().multiGet(orderStatusKeys)
+        Set<String> orderStatusKeys = cachePort.getAllKeysByNamePattern(ORDER_STATUS_CACHE_PREFIX_KEY + "*");
+        List<Order> ordersWithActiveStatus = (List<Order>) cachePort.getAllDataByKeys(orderStatusKeys)
                 .stream()
                 .map(object -> objectMapper.convertValue(object, Order.class)).sorted(Comparator.comparing(Order::id))
                 .collect(Collectors.toList());
@@ -89,33 +85,28 @@ public class OrderServiceImpl implements OrderService {
         Order resultOrder = orderRepository.save(orderEntityToBeSaved).toDomain();
 
         if (resultOrder.status().value().equalsIgnoreCase(StatusEnum.FINALIZADO.toString())) {
-            redisTemplate.opsForValue().set(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder, 3,
-                    TimeUnit.MINUTES);
+            cachePort.setKeyWithExpirationTimeInMinutes(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder,
+                    3);
         } else {
-            redisTemplate.opsForValue().set(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder);
+            cachePort.setKeyWithoutExpirationTime(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder);
         }
 
         return resultOrder;
     }
 
     @EventListener(ApplicationReadyEvent.class)
+    @Override
     public void initializeOrderActiveStatusCache() {
-        // TODO: Remover Mock
-        List<Order> orderToInsert = new ArrayList<>();
-        for (Integer i = 0; i < 10; i++) {
 
-            orderToInsert.add(new Order(Integer.toUnsignedLong(i), "recebido",
-                    LocalDate.now().plusDays(Integer.toUnsignedLong(i))));
-        }
-        orderRepository.saveAll(orderToInsert.stream().map(OrderEntity::fromDomain).toList());
+        cachePort.clearAllCaches();
 
         List<Status> searchedStatus = StatusEnum.getActiveStatus().stream().map(Status::new).toList();
         var orderEntityList = orderRepository.findAllByStatusIn(searchedStatus.stream().map(Status::value).toList());
         List<Order> orderList = orderEntityList.stream().map(order -> order.toDomain()).toList();
 
-        redisTemplate.opsForValue().multiSet(
-                orderList.stream().collect(
-                        Collectors.toMap(order -> ORDER_STATUS_CACHE_PREFIX_KEY + order.id(), order -> order)));
+        cachePort.setMultiKeyWithoutExpirationTime(orderList.stream().collect(
+                Collectors.toMap(order -> ORDER_STATUS_CACHE_PREFIX_KEY + order.id(), order -> order)));
+
     }
 
 }
