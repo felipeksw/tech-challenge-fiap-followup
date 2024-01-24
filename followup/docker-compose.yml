@@ -4,7 +4,7 @@ services:
   database:
     container_name: tech_challenge_db
     build:
-      context: database
+      context: ../database
       dockerfile: Dockerfile
     image: tech_challenge_db:latest
     ports:
@@ -30,6 +30,7 @@ services:
       - database
     ports:
       - 8080:8080
+    restart: always
     networks:
       - app_network
 

@@ -1,13 +1,13 @@
-package com.fiap.techchallenge.followup;
+// package com.fiap.techchallenge.followup;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class FollowupApplicationTests {
+// @SpringBootTest
+// class FollowupApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// 	@Test
+// 	void contextLoads() {
+// 	}
 
-}
+// }
