@@ -46,8 +46,7 @@ public class RedisCache implements CachePort {
 
     @Override
     public void setMultiKeyWithoutExpirationTime(Map<? extends String, ? extends Object> keyValueList) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setMultiKeyWithoutExpirationTime'");
+        redisTemplate.opsForValue().multiSet(keyValueList);
     }
 
 }
