@@ -1,10 +1,10 @@
 name: Followup App CI with Maven
 
 on:
-#  push:
-#    branches: [ "main" ]
-  pull_request:
+  push:
     branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
 env:
   BRANCH_NAME: ${{github.ref_name}}
   APP_NAME: tech-challenge-fiap-followup
