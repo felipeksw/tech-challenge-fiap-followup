@@ -2,9 +2,12 @@ package com.fiap.techchallenge.followup.gateway.port.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +23,13 @@ public class RedisCache implements CachePort {
 
     @Override
     public void clearAllCaches() {
-        redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+        RedisConnectionFactory redisConnectionFactory = redisTemplate.getConnectionFactory();
+
+        Objects.requireNonNull(redisConnectionFactory, "The redis connection factory mustn't  null");
+
+        RedisConnection redisConnection = redisConnectionFactory.getConnection();
+
+        redisConnection.serverCommands().flushAll();
     }
 
     @Override
