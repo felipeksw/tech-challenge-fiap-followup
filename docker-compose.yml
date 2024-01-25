@@ -4,7 +4,7 @@ services:
   database:
     container_name: tech_challenge_db
     build:
-      context: ../database
+      context: mysqldb
       dockerfile: Dockerfile
     image: tech_challenge_db:latest
     ports:
