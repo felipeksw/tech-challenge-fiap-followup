@@ -5,12 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.util.Set;
 
+import javax.swing.Spring;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fiap.techchallenge.followup.application.enums.StatusEnum;
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 
-public class StatusTest {
+@ExtendWith(SpringExtension.class)
+class StatusTest {
 
     private String NULL_STATUS_MESSAGE = "Invalid Status: status must not be null or empty";
     private String UPPERCASE_STATUS_MESSAGE = "Invalid Status: status must not contain uppercase letters";
@@ -19,7 +24,7 @@ public class StatusTest {
     private Set<String> VALID_STATUS = StatusEnum.getValidStatus();
 
     @Test
-    public void givenNullStatus_WhenNewStatus_ThenTrownInvalidData() {
+    void givenNullStatus_WhenNewStatus_ThenTrownInvalidData() {
         var receivedException = assertThrowsExactly(InvalidDataException.class, () -> new Status(null),
                 "Exception different than expected!");
 
@@ -28,7 +33,7 @@ public class StatusTest {
     }
 
     @Test
-    public void givenContainedUpperCase_WhenNewStatus_ThenTrownInvalidData() {
+    void givenContainedUpperCase_WhenNewStatus_ThenTrownInvalidData() {
         var receivedException = assertThrowsExactly(InvalidDataException.class, () -> new Status("Recebido"),
                 "Exception different than expected!");
 
@@ -37,7 +42,7 @@ public class StatusTest {
     }
 
     @Test
-    public void givenInvalidStatus_WhenNewStatus_ThenTrownInvalidData() {
+    void givenInvalidStatus_WhenNewStatus_ThenTrownInvalidData() {
         var receivedException = assertThrowsExactly(InvalidDataException.class, () -> new Status("enviado"),
                 "Exception different than expected!");
 
