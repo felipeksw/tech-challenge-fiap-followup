@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.util.Set;
 
-import javax.swing.Spring;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

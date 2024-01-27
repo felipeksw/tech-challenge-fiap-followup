@@ -4,7 +4,6 @@ import static com.fiap.techchallenge.followup.util.ConstantsUtil.ORDER_NOT_FOUND
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;

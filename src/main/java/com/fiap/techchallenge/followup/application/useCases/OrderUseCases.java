@@ -1,7 +1,6 @@
 package com.fiap.techchallenge.followup.application.useCases;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -9,11 +8,11 @@ import com.fiap.techchallenge.followup.application.services.OrderService;
 import com.fiap.techchallenge.followup.domain.Order;
 import com.fiap.techchallenge.followup.domain.Status;
 import com.fiap.techchallenge.followup.domain.exceptions.BadRequestException;
+import com.fiap.techchallenge.followup.domain.exceptions.BaseHttpException.RequestDataDto;
 import com.fiap.techchallenge.followup.domain.exceptions.InternalServerErrorException;
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.domain.exceptions.ResourceNotFoundException;
-import com.fiap.techchallenge.followup.domain.exceptions.BaseHttpException.RequestDataDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderUpdateStatusResponseDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderUpdateStatusResquestDto;
