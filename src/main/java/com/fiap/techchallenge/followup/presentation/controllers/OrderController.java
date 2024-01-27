@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,6 +86,25 @@ public class OrderController {
     @PostMapping(value = "/refresh-cache")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> refreshOrderStatusCache() {
+        orderUseCases.refreshOrderStatusCache();
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "Sincroniza a ordem no banco de dados com o cache a partir do id passado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ordem sincronizada com o cache", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Nenhum pedido encontrado", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Problemas internos durante a sincronização da ordem", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
+            })
+    })
+    @PostMapping(value = "/{orderId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<OrderDto> syncOrderToOrderStatusCache(@PathVariable Long orderId) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderUseCases.syncOrderToOrderStatusCache(orderId));
     }
 }

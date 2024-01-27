@@ -56,4 +56,17 @@ public class OrderUseCases {
         }
     }
 
+    public OrderDto syncOrderToOrderStatusCache(Long id) {
+        try {
+            Order order = orderService.syncOrderToOrderStatusCache(id);
+            return OrderDto.of(order);
+        } catch (NotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage(), new RequestDataDto(id));
+        } catch (InvalidDataException e) {
+            throw new BadRequestException(e.getMessage(), new RequestDataDto(id));
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(id));
+        }
+    }
+
 }

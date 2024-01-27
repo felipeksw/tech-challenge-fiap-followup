@@ -53,29 +53,20 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order updateStatus(Long id, Status newStatus) {
 
-        Optional<OrderEntity> orderEntity = orderRepository.findById(id);
+        OrderEntity orderEntity = findOrderEntityById(id);
 
-        if (orderEntity.isEmpty()) {
-            throw new NotFoundException(ORDER_NOT_FOUND);
-        }
-
-        Order orderSaved = orderEntity.get().toDomain();
+        Order orderSaved = orderEntity.toDomain();
 
         if (!orderSaved.status().newStatusIsValid(newStatus)) {
             throw new InvalidDataException(
                     "Status " + orderSaved.status().value() + " cannot be changed to " + newStatus.value());
         }
 
-        OrderEntity orderEntityToBeSaved = orderEntity.get();
+        OrderEntity orderEntityToBeSaved = orderEntity;
         orderEntityToBeSaved.setStatus(newStatus.value());
         Order resultOrder = orderRepository.save(orderEntityToBeSaved).toDomain();
 
-        if (resultOrder.status().value().equalsIgnoreCase(StatusEnum.FINALIZADO.toString())) {
-            cachePort.setKeyWithExpirationTimeInMinutes(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder,
-                    3);
-        } else {
-            cachePort.setKeyWithoutExpirationTime(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder);
-        }
+        setOrderOnCache(resultOrder);
 
         return resultOrder;
     }
@@ -96,4 +87,35 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public Order syncOrderToOrderStatusCache(Long id) {
+
+        OrderEntity orderEntity = findOrderEntityById(id);
+
+        Order orderToSync = orderEntity.toDomain();
+
+        setOrderOnCache(orderToSync);
+
+        return orderToSync;
+
+    }
+
+    private OrderEntity findOrderEntityById(Long id) {
+        Optional<OrderEntity> orderEntity = orderRepository.findById(id);
+
+        if (orderEntity.isEmpty()) {
+            throw new NotFoundException(ORDER_NOT_FOUND);
+        }
+        return orderEntity.get();
+    }
+
+    private void setOrderOnCache(Order resultOrder) {
+
+        if (resultOrder.status().value().equalsIgnoreCase(StatusEnum.FINALIZADO.toString())) {
+            cachePort.setKeyWithExpirationTimeInMinutes(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder,
+                    3);
+        } else {
+            cachePort.setKeyWithoutExpirationTime(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder);
+        }
+    }
 }

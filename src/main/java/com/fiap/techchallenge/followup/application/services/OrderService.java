@@ -12,4 +12,6 @@ public interface OrderService {
     Order updateStatus(Long id, Status newStatus);
 
     void initializeOrderActiveStatusCache();
+
+    Order syncOrderToOrderStatusCache(Long id);
 }
