@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import com.fiap.techchallenge.followup.domain.Status;
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.gateway.entity.OrderEntity;
+import com.fiap.techchallenge.followup.gateway.entity.OrderItemsEntity;
 import com.fiap.techchallenge.followup.gateway.port.CachePort;
 import com.fiap.techchallenge.followup.gateway.repository.OrderRepository;
 
@@ -131,6 +133,17 @@ class OrderServiceImplTest {
                 .id(1l)
                 .status("recebido")
                 .createdAt(LocalDate.of(2000, 1, 1))
+                .client("Felipe")
+                .customerId(1l)
+                .paymentMethod("Cartao")
+                .price(BigDecimal.TEN)
+                .orderItems(List.of(OrderItemsEntity.builder()
+                        .id(1l)
+                        .description("Descricao")
+                        .productId(1l)
+                        .quantity(10l)
+                        .orders(new OrderEntity())
+                        .build()))
                 .build();
 
         when(orderRepository.findById(1l)).thenReturn(Optional.of(orderEntityMock));
