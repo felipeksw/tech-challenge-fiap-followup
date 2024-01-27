@@ -2,6 +2,10 @@ package com.fiap.techchallenge.followup.util;
 
 public class ConstantsUtil {
 
+    private ConstantsUtil() {
+
+    }
+
     public final static String PRODUCT_NOT_FOUND = "Produto não encontrado";
     public final static String CUSTOMER_NOT_FOUND = "Cliente não encontrado";
     public final static String ORDER_NOT_FOUND = "Ordem não encontrada";

@@ -13,6 +13,7 @@ import com.fiap.techchallenge.followup.domain.exceptions.InternalServerErrorExce
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.domain.exceptions.ResourceNotFoundException;
+import com.fiap.techchallenge.followup.domain.exceptions.BaseHttpException.RequestDataDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderUpdateStatusResponseDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderUpdateStatusResquestDto;
@@ -28,9 +29,9 @@ public class OrderUseCases {
     public List<OrderDto> findAllWithActiveStatus() {
         try {
             List<Order> orders = orderService.findAllWithActiveStatus();
-            return orders.stream().map(x -> OrderDto.of(x)).collect(Collectors.toList());
+            return orders.stream().map(x -> OrderDto.of(x)).toList();
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(null));
         }
     }
 
@@ -40,11 +41,11 @@ public class OrderUseCases {
                     new Status(updateStatusResquest.getStatus()));
             return OrderUpdateStatusResponseDto.of(order, "order status updated");
         } catch (NotFoundException e) {
-            throw new ResourceNotFoundException(e.getMessage(), updateStatusResquest);
+            throw new ResourceNotFoundException(e.getMessage(), new RequestDataDto(updateStatusResquest));
         } catch (InvalidDataException e) {
-            throw new BadRequestException(e.getMessage(), updateStatusResquest);
+            throw new BadRequestException(e.getMessage(), new RequestDataDto(updateStatusResquest));
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage(), updateStatusResquest);
+            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(updateStatusResquest));
         }
     }
 
@@ -53,7 +54,7 @@ public class OrderUseCases {
             orderService.initializeOrderActiveStatusCache();
 
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage());
+            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(null));
         }
     }
 

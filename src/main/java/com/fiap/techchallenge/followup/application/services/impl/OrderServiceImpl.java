@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
         return cachePort.getAllDataByKeys(orderStatusKeys)
                 .stream()
                 .map(object -> objectMapper.convertValue(object, Order.class)).sorted(Comparator.comparing(Order::id))
-                .collect(Collectors.toList());
+                .toList();
 
     }
 

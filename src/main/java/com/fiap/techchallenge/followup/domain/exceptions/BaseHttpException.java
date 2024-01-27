@@ -1,19 +1,16 @@
 package com.fiap.techchallenge.followup.domain.exceptions;
 
+import java.io.Serializable;
+
 import org.springframework.http.HttpStatus;
 
 public class BaseHttpException extends RuntimeException {
 
-    private HttpStatus statusCode;
+    private final HttpStatus statusCode;
 
-    protected Object requestData;
+    private final RequestDataDto requestData;
 
-    public BaseHttpException(HttpStatus statusCode, String message) {
-        super(message);
-        this.statusCode = statusCode;
-    }
-
-    public BaseHttpException(HttpStatus statusCode, String message, Object requestData) {
+    public BaseHttpException(HttpStatus statusCode, String message, RequestDataDto requestData) {
         super(message);
         this.statusCode = statusCode;
         this.requestData = requestData;
@@ -23,7 +20,11 @@ public class BaseHttpException extends RuntimeException {
         return statusCode;
     }
 
-    public Object getRequestData() {
+    public RequestDataDto getRequestData() {
         return requestData;
+    }
+
+    public record RequestDataDto(
+            Object requestData) implements Serializable {
     }
 }
