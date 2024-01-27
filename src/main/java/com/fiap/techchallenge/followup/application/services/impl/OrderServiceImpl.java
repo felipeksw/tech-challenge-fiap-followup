@@ -55,11 +55,12 @@ public class OrderServiceImpl implements OrderService {
     public Order updateStatus(Long id, Status newStatus) {
 
         Optional<OrderEntity> orderEntity = orderRepository.findById(id);
-        Order orderSaved = orderEntity.isPresent() ? orderEntity.get().toDomain() : null;
 
-        if (Objects.isNull(orderSaved)) {
+        if (orderEntity.isEmpty()) {
             throw new NotFoundException(ORDER_NOT_FOUND);
         }
+
+        Order orderSaved = orderEntity.get().toDomain();
 
         if (!orderSaved.status().newStatusIsValid(newStatus)) {
             throw new InvalidDataException(
@@ -87,7 +88,8 @@ public class OrderServiceImpl implements OrderService {
         cachePort.clearAllCaches();
 
         List<Status> searchedStatus = StatusEnum.getActiveStatus().stream().map(Status::new).toList();
-        var orderEntityList = orderRepository.findAllByStatusIn(searchedStatus.stream().map(Status::value).toList());
+        List<OrderEntity> orderEntityList = orderRepository
+                .findAllByStatusIn(searchedStatus.stream().map(Status::value).toList());
         List<Order> orderList = orderEntityList.stream().map(OrderEntity::toDomain).toList();
 
         cachePort.setMultiKeyWithoutExpirationTime(orderList.stream().collect(
