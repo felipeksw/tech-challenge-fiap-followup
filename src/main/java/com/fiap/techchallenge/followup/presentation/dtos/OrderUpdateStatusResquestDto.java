@@ -17,11 +17,4 @@ public class OrderUpdateStatusResquestDto {
 
     private long orderId;
     private String status;
-
-    public static OrderUpdateStatusResponseDto of(Order order) {
-        return OrderUpdateStatusResponseDto.builder()
-                .orderId(order.id())
-                .status(order.status().value())
-                .build();
-    }
 }

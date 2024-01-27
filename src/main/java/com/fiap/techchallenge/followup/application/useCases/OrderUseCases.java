@@ -29,7 +29,7 @@ public class OrderUseCases {
     public List<OrderDto> findAllWithActiveStatus() {
         try {
             List<Order> orders = orderService.findAllWithActiveStatus();
-            return orders.stream().map(x -> OrderDto.of(x)).toList();
+            return orders.stream().map(OrderDto::of).toList();
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(null));
         }
@@ -52,7 +52,6 @@ public class OrderUseCases {
     public void refreshOrderStatusCache() {
         try {
             orderService.initializeOrderActiveStatusCache();
-
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(null));
         }

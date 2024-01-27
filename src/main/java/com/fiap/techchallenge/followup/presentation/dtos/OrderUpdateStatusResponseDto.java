@@ -4,6 +4,7 @@ import com.fiap.techchallenge.followup.domain.Order;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 @Builder
 public class OrderUpdateStatusResponseDto {
 
