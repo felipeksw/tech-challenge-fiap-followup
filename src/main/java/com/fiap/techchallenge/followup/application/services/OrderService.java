@@ -9,9 +9,9 @@ public interface OrderService {
 
     List<Order> findAllWithActiveStatus();
 
-    Order updateStatus(Long id, Status newStatus);
+    Order updateStatus(Long orderId, Status newStatus);
 
     void initializeOrderActiveStatusCache();
 
-    Order syncOrderToOrderStatusCache(Long id);
+    Order syncOrderToOrderStatusCache(Long orderId);
 }

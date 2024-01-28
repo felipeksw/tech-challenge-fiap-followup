@@ -51,9 +51,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order updateStatus(Long id, Status newStatus) {
+    public Order updateStatus(Long orderId, Status newStatus) {
 
-        OrderEntity orderEntity = findOrderEntityById(id);
+        OrderEntity orderEntity = findOrderEntityById(orderId);
 
         Order orderSaved = orderEntity.toDomain();
 
@@ -88,9 +88,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order syncOrderToOrderStatusCache(Long id) {
+    public Order syncOrderToOrderStatusCache(Long orderId) {
 
-        OrderEntity orderEntity = findOrderEntityById(id);
+        OrderEntity orderEntity = findOrderEntityById(orderId);
 
         Order orderToSync = orderEntity.toDomain();
 
@@ -100,8 +100,8 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    private OrderEntity findOrderEntityById(Long id) {
-        Optional<OrderEntity> orderEntity = orderRepository.findById(id);
+    private OrderEntity findOrderEntityById(Long orderId) {
+        Optional<OrderEntity> orderEntity = orderRepository.findById(orderId);
 
         if (orderEntity.isEmpty()) {
             throw new NotFoundException(ORDER_NOT_FOUND);

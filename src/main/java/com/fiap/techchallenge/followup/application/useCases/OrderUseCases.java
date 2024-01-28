@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.followup.application.useCases;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -56,16 +57,14 @@ public class OrderUseCases {
         }
     }
 
-    public OrderDto syncOrderToOrderStatusCache(Long id) {
+    public OrderDto syncOrderToOrderStatusCache(Long orderId) {
         try {
-            Order order = orderService.syncOrderToOrderStatusCache(id);
+            Order order = orderService.syncOrderToOrderStatusCache(orderId);
             return OrderDto.of(order);
         } catch (NotFoundException e) {
-            throw new ResourceNotFoundException(e.getMessage(), new RequestDataDto(id));
-        } catch (InvalidDataException e) {
-            throw new BadRequestException(e.getMessage(), new RequestDataDto(id));
+            throw new ResourceNotFoundException(e.getMessage(), new RequestDataDto(Map.of("orderId", orderId)));
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(id));
+            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(Map.of("orderId", orderId)));
         }
     }
 
