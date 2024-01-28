@@ -33,8 +33,8 @@ jobs:
     - name: Check Docker Tag
       run: echo ${{ env.DOCKER_TAG }}
 
-    - name: Docker Build
-      run: docker build --tag ${{ env.APP_NAME }}:${{ env.DOCKER_TAG}} .
+#    - name: Docker Build
+#      run: docker build --tag ${{ env.APP_NAME }}:${{ env.DOCKER_TAG}} .
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -44,14 +44,17 @@ jobs:
         aws-region: us-east-1
 
     - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Push to Amazon ECR
-      id: ecr
-      uses: jwalton/gh-ecr-push@v1
+      id: login-ecr-public
+      uses: aws-actions/amazon-ecr-login@v2
       with:
-        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        region: us-east-1
-        image: ${{ env.APP_NAME }}:${{ env.DOCKER_TAG}}
+        registry-type: public
+
+    - name: Build and Push to Amazon ECR
+      env:
+        REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+        REGISTRY_ALIAS: "u0d1o6m1"
+        REPOSITORY: ${{ env.APP_NAME }}
+        IMAGE_TAG: ${{ env.DOCKER_TAG }}
+      run: |
+        docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
