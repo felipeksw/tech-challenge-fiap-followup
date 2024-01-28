@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.fiap.techchallenge.followup.application.services.OrderService;
 import com.fiap.techchallenge.followup.domain.Order;
 import com.fiap.techchallenge.followup.domain.Status;
-import com.fiap.techchallenge.followup.domain.exceptions.BaseHttpException.RequestDataDto;
 import com.fiap.techchallenge.followup.domain.exceptions.BadRequestException;
+import com.fiap.techchallenge.followup.domain.exceptions.BaseHttpException.RequestDataDto;
 import com.fiap.techchallenge.followup.domain.exceptions.InternalServerErrorException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.domain.exceptions.ResourceNotFoundException;
@@ -179,5 +181,56 @@ public class OrderUseCasesTest {
         orderUseCases.refreshOrderStatusCache();
 
         verify(orderService, only()).initializeOrderActiveStatusCache();
+    }
+
+    @Test
+    void when_SyncAOrderStatusOnCacheAndIdDoesntExistis_Then_ThrowAException() {
+
+        NotFoundException exceptionToThrow = new NotFoundException("Order id not found");
+        when(orderService.syncOrderToOrderStatusCache(anyLong())).thenThrow(exceptionToThrow);
+
+        ResourceNotFoundException receivedException = assertThrowsExactly(ResourceNotFoundException.class,
+                () -> orderUseCases.syncOrderToOrderStatusCache(1l));
+
+        ResourceNotFoundException expectedException = new ResourceNotFoundException(exceptionToThrow.getMessage(),
+                new RequestDataDto(Map.of("orderId", 1l)));
+        assertAll("Check all information about the exception",
+                () -> assertEquals(expectedException.getMessage(), receivedException.getMessage()),
+                () -> assertEquals(expectedException.getRequestData(), receivedException.getRequestData()),
+                () -> assertEquals(HttpStatus.NOT_FOUND, receivedException.getStatusCode()));
+
+    }
+
+    @Test
+    void when_SyncAOrderStatusOnCacheAndHaveAError_Then_ThrowAException() {
+
+        RuntimeException exceptionToThrow = new RuntimeException("Error during the sync of order in cache");
+        when(orderService.syncOrderToOrderStatusCache(anyLong())).thenThrow(exceptionToThrow);
+
+        InternalServerErrorException receivedException = assertThrowsExactly(InternalServerErrorException.class,
+                () -> orderUseCases.syncOrderToOrderStatusCache(1l));
+
+        InternalServerErrorException expectedException = new InternalServerErrorException(exceptionToThrow.getMessage(),
+                new RequestDataDto(Map.of("orderId", 1l)));
+        assertAll("Check all information about the exception",
+                () -> assertEquals(expectedException.getMessage(), receivedException.getMessage()),
+                () -> assertEquals(expectedException.getRequestData(), receivedException.getRequestData()),
+                () -> assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, receivedException.getStatusCode()));
+
+    }
+
+    @Test
+    void when_SyncedAOrderStatus_Then_ReturnTheOrderDtoSynced() {
+
+        Order orderSyncedMock = new Order(1l, "pronto", LocalDate.of(2000, 1, 1));
+
+        when(orderService.syncOrderToOrderStatusCache(anyLong())).thenReturn(orderSyncedMock);
+
+        OrderDto receivedSyncedOrderDto = orderUseCases
+                .syncOrderToOrderStatusCache(1l);
+
+        OrderDto expectedSyncedOrderDto = new OrderDto(1l, "pronto", LocalDate.of(2000, 1, 1));
+
+        assertEquals(expectedSyncedOrderDto, receivedSyncedOrderDto);
     }
 }
