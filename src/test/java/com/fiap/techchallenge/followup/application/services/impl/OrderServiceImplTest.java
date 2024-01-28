@@ -205,4 +205,28 @@ class OrderServiceImplTest {
         assertEquals(expectedKeyValueList, keyValueCaptor.getValue());
 
     }
+
+    @Test
+    void when_SyncAOrderInCacheWithActiveStatus_Then_SetOnCacheWithoutExpirationTime() {
+        OrderEntity orderEntityMock = OrderEntity.builder()
+                .id(1l)
+                .status("pronto")
+                .createdAt(LocalDate.of(2000, 1, 1))
+                .build();
+
+        when(orderRepository.findById(1l)).thenReturn(Optional.of(orderEntityMock));
+
+        Order receivedOrder = orderService.syncOrderToOrderStatusCache(1l);
+
+        Order expectedOrder = Order.builder()
+                .id(1l)
+                .status("pronto")
+                .createdAt(LocalDate.of(2000, 1, 1))
+                .build();
+
+        assertEquals(expectedOrder, receivedOrder);
+        verify(orderRepository, only()).findById(1l);
+        verify(cachePort, only()).setKeyWithoutExpirationTime("orderStatus::1",
+                expectedOrder);
+    }
 }
