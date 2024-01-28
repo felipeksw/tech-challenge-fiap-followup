@@ -1,9 +1,10 @@
-resource "aws_ecr_repository" "tech-challenge-ecr" {
-  name                 = "tech-challenge-fiap-followup"
-  image_tag_mutability = "MUTABLE"
+resource "aws_ecrpublic_repository" "tech-challenge-ecr" {
 
-  image_scanning_configuration {
-    scan_on_push = true
+  repository_name     = "tech-challenge-fiap-followup"
+
+  catalog_data {
+    about_text        = "FIAP 2023 - Pós Tech - Tech Callenge - Fase 4"
   }
+
   tags = var.tag
 }
