@@ -3,8 +3,7 @@ name: Followup App CI with Maven
 on:
   push:
     branches: [ "main" ]
-#  pull_request:
-#    branches: [ "main" ]
+
 env:
   BRANCH_NAME: ${{github.ref_name}}
   APP_NAME: tech-challenge-fiap-followup
@@ -35,7 +34,7 @@ jobs:
       run: echo ${{ env.DOCKER_TAG }}
 
     - name: Docker Build
-      run: docker build --tag ${{ env.APP_NAME }}:${{ env.DOCKER_TAG}} ./followup/.
+      run: docker build --tag ${{ env.APP_NAME }}:${{ env.DOCKER_TAG}} .
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
