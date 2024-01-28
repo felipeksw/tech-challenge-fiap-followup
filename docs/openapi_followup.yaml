@@ -6,12 +6,37 @@ servers:
   - url: http://localhost:8080
 
 paths:
-  /followup/order:
+  /followup/order/{orderId}:
+    post:
+      tags:
+        - Follow-up
+      summary: Sync a specific order to a key-value database
+      responses:
+        '200':
+          $ref: '#/components/requestBodies/200orderStatus'
+        '400':
+          $ref: '#/components/requestBodies/400orderStatus'
+        '404':
+          $ref: '#/components/requestBodies/404orderStatus'
+        '500':
+          $ref: '#/components/requestBodies/500orderStatus'
+
+  /followup/order/refresh-cache":
+    post:
+      tags:
+        - Follow-up
+      summary: Sync all valid orders to a key-value database
+      responses:
+        '200':
+          $ref: '#/components/requestBodies/200refreshCache'
+        '500':
+          $ref: '#/components/requestBodies/500orderStatus'
+
+  /followup/order/:
     put:
       tags:
         - Follow-up
       summary: Change the status of an order
-      operationId: _DEFINIR_
       requestBody:
         required: true
         $ref: '#/components/requestBodies/requestOrderStatus'
@@ -20,18 +45,28 @@ paths:
           $ref: '#/components/requestBodies/200orderStatus'
         '400':
           $ref: '#/components/requestBodies/400orderStatus'
+        '404':
+          $ref: '#/components/requestBodies/404orderStatus'
         '500':
           $ref: '#/components/requestBodies/500orderStatus'
     get:
       tags:
         - Follow-up
       summary: Returns all active orders to show in monitoring panel
-      operationId: _DEFINIR_
       responses:
         '200':
           $ref: '#/components/requestBodies/200orderStatusList'
-        '400':
-          $ref: '#/components/requestBodies/400Standard' 
+        '500':
+          $ref: '#/components/requestBodies/500Standard'
+
+  /followup/health:
+    get:
+      tags:
+        - Health Check
+      summary: Returns the health of the service
+      responses:
+        '200':
+          $ref: '#/components/requestBodies/200healthCheck'
         '500':
           $ref: '#/components/requestBodies/500Standard'
 
@@ -74,6 +109,19 @@ components:
                 type: string
                 example: 'order status updated'
 
+    404orderStatus:
+      description: 'Not Found'
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/orderStatusObject'
+            - type: object
+            properties:      
+              message:
+                type: string
+                example: 'orderId not found'
+
     400orderStatus:
       description: 'Bad Request'
       content:
@@ -114,6 +162,28 @@ components:
                 createdAt:
                   type: string
                   format: date
+
+    200refreshCache:
+      description: 'Healthy service return'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 'cache up to date'
+
+    200healthCheck:
+      description: 'Healthy service return'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: 'OK'
 
     400Standard:
       description: 'Bad Request'

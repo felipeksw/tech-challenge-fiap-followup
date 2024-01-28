@@ -16,9 +16,22 @@ Deve ter alta capacidade de recuperação e disponibilização das informações
 ---
 
 ### Requisitos
+
+#### Inicialização do serviço
 - Ao ser inicializado o subsistema de acompanhamento deve recuperar todos os pedidos que não estejam com o status Finalizado do banco de dados relacional e deve carrega-los no banco de dados não relacional do tipo chave-valor.
     - chave = pedido
     - valor = status
+
+#### Recurso para adicionar uma ordem (sincronizar) na base de dados não relacional
+- Ao receber uma "request" para sincronização (método POS) de um pedido o recurso deve validar:
+    - O pedido existe na base de dados relacional
+    - O status é um status válido
+        - Deve verificar a sequência permitida para cada status
+    - Atenção: um pedido no status Finalizado não deve ser sincronizado base de dados não relacional
+- Caso ocorra algum erro na validação, retornar o código de erro http 400 com a descrição do erro
+- Caso ocorra sucesso na validação, o subsistema deve realizar a adição da chave/valor base de dados não relacional do pedido com o seu status atual
+    - No caso de sucesso na alteração, deve retornar o código http 200 com uma mensagem
+    - No caso de erro ao realizar a alteração, em qualquer um dos bancos, não deve efetivar a alteração em nenhum dos bancos e deve retornar um código http 500 com a mensagem de erro
 
 #### Recurso de alteração de status de um pedido
 - Ao receber uma "request" para alteração do status (método PUT) de um pedido o recurso deve validar:
@@ -37,6 +50,14 @@ Deve ter alta capacidade de recuperação e disponibilização das informações
 - Caso o subsistema encontre ao menos um registro na base de dados, deve retornar um código http 200 com a lista de pedidos encontrados
 - Caso a “request” não encontre nenhum registro, deve retornar um código http 200 com uma lista vazia
 - Caso ocorra um erro ao processar a recuperação da lista, o subsistema deve retornar um código http 500 com a mensagem de erro
+
+#### Recurso para refresh completo da base de dados não relacional 
+- Ao receber a "request" para refresh do "cache" (base de dados não relacional) o serviço deve:
+    - Excluir todas as chaves do banco de dados não relacional
+    - Recuperar todos os pedidos com status diferente de **Finalizado**
+    - Inserir esse conjunto de valores na base de dados não relacional, com o mesmo padrão que foi usado no recurso de inicialização
+- Caso ocorra sucesso no refresh, deve retornar o código http 200 com uma mensagem
+- Caso ocorra erro ao realizar o refresh, em qualquer um dos bancos, não deve efetivar a carga na base de dados não relacional e deve retornar um código http 500 com a mensagem de erro
 
 ---
 
@@ -60,7 +81,7 @@ Para visualização completa do Evento Storm da aplicação acesse: [miro.com](h
 
 ### Entregáveis
 Dando continuidade ao desenvolvimento do software para a lanchonete, teremos as seguintes melhorias e alterações:
-- [ ] Refatore o projeto separando em ao menos 3 microsserviços:
+- [x] Refatore o projeto separando em ao menos 3 microsserviços:
     - ~~Pedido: responsável por retornar as informações necessárias para montar um pedido.~~
     - ~~Pagamento: responsável por realizar a cobrança de um pedido gerado anteriormente.~~
     - **Produção**: responsável por acompanhar a produção/fila de pedidos e atualização de status.
@@ -68,5 +89,5 @@ Dando continuidade ao desenvolvimento do software para a lanchonete, teremos as 
 - [ ] Ao refatorar, os microsserviços devem conter testes unitários usando BDD com no mínimo 80% de cobertura de testes por cada microsserviço.
 - [x] Seus repositórios devem ser separados para cada aplicação e devem respeitar as seguintes regras:
     - [x] Main protegida.
-    - [ ] PR para branch main deve validar o build da aplicação, e qualidade de código via sonarqube.
-    - [ ] Automatize o deploy dos seus microsserviços.
+    - [x] PR para branch main deve validar o build da aplicação, e qualidade de código via sonarqube.
+    - [x] Automatize o deploy dos seus microsserviços.
