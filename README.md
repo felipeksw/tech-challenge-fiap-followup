@@ -79,6 +79,12 @@ Para visualização completa do Evento Storm da aplicação acesse: [miro.com](h
 
 ---
 
+### Artefatos
+- [Repositório público no ECR da AWS](https://gallery.ecr.aws/u0d1o6m1/tech-challenge-fiap-followup)
+- [Repositório público de relatórios do SonarCloud](https://sonarcloud.io/project/pull_requests_list?id=felipeksw_tech-challenge-fiap-followup)
+
+---
+
 ### Entregáveis
 Dando continuidade ao desenvolvimento do software para a lanchonete, teremos as seguintes melhorias e alterações:
 - [x] Refatore o projeto separando em ao menos 3 microsserviços:
@@ -86,7 +92,7 @@ Dando continuidade ao desenvolvimento do software para a lanchonete, teremos as 
     - ~~Pagamento: responsável por realizar a cobrança de um pedido gerado anteriormente.~~
     - **Produção**: responsável por acompanhar a produção/fila de pedidos e atualização de status.
 - [x] Lembre-se de trabalhar com bancos de dados para cada aplicação. Use ao menos um banco de dados NoSQL e um SQL; caso queira fazer com mais bancos, você pode decidir quais utilizar. 
-- [ ] Ao refatorar, os microsserviços devem conter testes unitários usando BDD com no mínimo 80% de cobertura de testes por cada microsserviço.
+- [x] Ao refatorar, os microsserviços devem conter testes unitários usando BDD com no mínimo 80% de cobertura de testes por cada microsserviço.
 - [x] Seus repositórios devem ser separados para cada aplicação e devem respeitar as seguintes regras:
     - [x] Main protegida.
     - [x] PR para branch main deve validar o build da aplicação, e qualidade de código via sonarqube.
