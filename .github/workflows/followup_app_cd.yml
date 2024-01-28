@@ -1,4 +1,4 @@
-name: Followup App CI with Maven
+name: Followup App CD with Maven
 
 on:
   push:
