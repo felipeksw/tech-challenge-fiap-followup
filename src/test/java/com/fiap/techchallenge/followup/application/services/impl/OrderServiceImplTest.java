@@ -54,13 +54,14 @@ class OrderServiceImplTest {
 
     @Test
     void when_FindAllOrderStatusActive_Then_ReturnListOfAllStatus() {
-        List<Object> orderMockList = List.of(new Order(1l, "recebido", LocalDate.now()),
-                new Order(2l, "em_preparacao", LocalDate.now()), new Order(3l, "pronto", LocalDate.now()),
-                new Order(4l, "finalizado", LocalDate.now()));
+        List<Object> orderMockList = List.of(new Order(1l, "order_received", LocalDate.now()),
+                new Order(2l, "order_in_production", LocalDate.now()),
+                new Order(3l, "order_completed", LocalDate.now()),
+                new Order(4l, "order_delivered", LocalDate.now()));
         when(cachePort.getAllKeysByNamePattern(any())).thenReturn(Set.of("1"));
         when(cachePort.getAllDataByKeys(any())).thenReturn(orderMockList);
 
-        List<Order> listOrder = orderService.findAllWithActiveStatus();
+        List<Order> listOrder = orderService.findAllOrderStatusWithActiveStatus();
 
         assertEquals(orderMockList, listOrder);
     }
@@ -71,7 +72,7 @@ class OrderServiceImplTest {
         when(orderRepository.findById(any())).thenReturn(Optional.empty());
 
         NotFoundException receivedException = assertThrowsExactly(NotFoundException.class,
-                () -> orderService.updateStatus(1l, new Status("finalizado")));
+                () -> orderService.updateStatus(1l, new Status("order_delivered")));
 
         assertEquals("Ordem não encontrada", receivedException.getMessage());
         verify(orderRepository, never()).save(any());
@@ -83,16 +84,16 @@ class OrderServiceImplTest {
     void when_UpdateStatusOfAOrderAndNextStatusIsInvalid_Then_ThrowAException() {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
-                .status("recebido")
+                .status("order_received")
                 .createdAt(LocalDate.now())
                 .build();
 
         when(orderRepository.findById(1l)).thenReturn(Optional.of(orderEntityMock));
 
         InvalidDataException receivedException = assertThrowsExactly(InvalidDataException.class,
-                () -> orderService.updateStatus(1l, new Status("pronto")));
+                () -> orderService.updateStatus(1l, new Status("order_completed")));
 
-        assertEquals("Status recebido cannot be changed to pronto", receivedException.getMessage());
+        assertEquals("Status order_received cannot be changed to order_completed", receivedException.getMessage());
         verify(orderRepository, never()).save(any());
         verifyNoInteractions(cachePort);
 
@@ -102,7 +103,7 @@ class OrderServiceImplTest {
     void when_UpdateStatusOfAOrderToFinalized_Then_SetOnCacheWith3MinExpirationTime() {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
-                .status("pronto")
+                .status("order_completed")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .build();
 
@@ -112,17 +113,17 @@ class OrderServiceImplTest {
 
         ArgumentCaptor<OrderEntity> orderEntitycaptor = ArgumentCaptor.forClass(OrderEntity.class);
 
-        Order receivedOrder = orderService.updateStatus(1l, new Status("finalizado"));
+        Order receivedOrder = orderService.updateStatus(1l, new Status("order_delivered"));
 
         Order expectedOrder = Order.builder()
                 .id(1l)
-                .status("finalizado")
+                .status("order_delivered")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .build();
 
         assertEquals(expectedOrder, receivedOrder);
         verify(orderRepository).save(orderEntitycaptor.capture());
-        assertEquals("finalizado", orderEntitycaptor.getValue().getStatus());
+        assertEquals("order_delivered", orderEntitycaptor.getValue().getStatus());
         verify(cachePort, only()).setKeyWithExpirationTimeInMinutes("orderStatus::1",
                 orderEntitycaptor.getValue().toDomain(), 3);
     }
@@ -131,7 +132,7 @@ class OrderServiceImplTest {
     void when_UpdateStatusOfAOrderToActiveStatus_Then_SetOnCacheWithoutExpirationTime() {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
-                .status("recebido")
+                .status("order_received")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .client("Felipe")
                 .customerId(1l)
@@ -152,17 +153,17 @@ class OrderServiceImplTest {
 
         ArgumentCaptor<OrderEntity> orderEntitycaptor = ArgumentCaptor.forClass(OrderEntity.class);
 
-        Order receivedOrder = orderService.updateStatus(1l, new Status("em_preparacao"));
+        Order receivedOrder = orderService.updateStatus(1l, new Status("order_in_production"));
 
         Order expectedOrder = Order.builder()
                 .id(1l)
-                .status("em_preparacao")
+                .status("order_in_production")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .build();
 
         assertEquals(expectedOrder, receivedOrder);
         verify(orderRepository).save(orderEntitycaptor.capture());
-        assertEquals("em_preparacao", orderEntitycaptor.getValue().getStatus());
+        assertEquals("order_in_production", orderEntitycaptor.getValue().getStatus());
         verify(cachePort, only()).setKeyWithoutExpirationTime("orderStatus::1",
                 orderEntitycaptor.getValue().toDomain());
 
@@ -172,12 +173,12 @@ class OrderServiceImplTest {
     void when_InitializeOrderStatusActiveCache_Then_ClearCacheAndSetTheListOfOrderActiveOnCache() {
         List<OrderEntity> orderEntityMocks = List.of(OrderEntity.builder()
                 .id(1l)
-                .status("recebido")
+                .status("order_received")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .build(),
                 OrderEntity.builder()
                         .id(2l)
-                        .status("em_preparacao")
+                        .status("order_in_production")
                         .createdAt(LocalDate.of(2000, 1, 2))
                         .build());
 
@@ -189,20 +190,20 @@ class OrderServiceImplTest {
         ArgumentCaptor<Map<String, Object>> keyValueCaptor = ArgumentCaptor
                 .forClass(Map.class);
 
-        List<String> expectedStatusActiveList = List.of("recebido", "em_preparacao", "pronto");
+        List<String> expectedStatusActiveList = List.of("order_received", "order_in_production", "order_completed");
 
-        HashMap<String, Object> expectedKeyValueList = new HashMap<String, Object>();
-        expectedKeyValueList.put("orderStatus::1", new Order(1l, "recebido", LocalDate.of(2000, 1, 1)));
-        expectedKeyValueList.put("orderStatus::2", new Order(2l, "em_preparacao", LocalDate.of(2000, 1, 2)));
-
+        HashMap<String, Object> expectedKeyValue = new HashMap<String, Object>();
+        expectedKeyValue.put("orderStatus::1", new Order(1l, "order_received", LocalDate.of(2000, 1, 1)));
+        expectedKeyValue.put("orderStatus::2", new Order(2l, "order_in_production", LocalDate.of(2000, 1, 2)));
+        List<HashMap<String, Object>> expectedKeyValueList = List.of(expectedKeyValue, new HashMap<String, Object>());
         orderService.initializeOrderActiveStatusCache();
 
         verify(cachePort, times(1)).clearAllCaches();
         verify(orderRepository).findAllByStatusIn(statusListCaptor.capture());
         assertEquals(expectedStatusActiveList.stream().sorted().toList(),
                 statusListCaptor.getValue().stream().sorted().toList());
-        verify(cachePort).setMultiKeyWithoutExpirationTime(keyValueCaptor.capture());
-        assertEquals(expectedKeyValueList, keyValueCaptor.getValue());
+        verify(cachePort, times(2)).setMultiKeyWithoutExpirationTime(keyValueCaptor.capture());
+        assertEquals(expectedKeyValueList, keyValueCaptor.getAllValues());
 
     }
 
@@ -210,7 +211,7 @@ class OrderServiceImplTest {
     void when_SyncAOrderInCacheWithActiveStatus_Then_SetOnCacheWithoutExpirationTime() {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
-                .status("pronto")
+                .status("order_completed")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .build();
 
@@ -220,7 +221,7 @@ class OrderServiceImplTest {
 
         Order expectedOrder = Order.builder()
                 .id(1l)
-                .status("pronto")
+                .status("order_completed")
                 .createdAt(LocalDate.of(2000, 1, 1))
                 .build();
 

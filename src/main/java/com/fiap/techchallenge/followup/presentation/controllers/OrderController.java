@@ -70,8 +70,8 @@ public class OrderController {
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<OrderDto>> findAllOrdersWithStatusActive() {
-        return ResponseEntity.status(HttpStatus.OK).body(orderUseCases.findAllWithActiveStatus());
+    public ResponseEntity<List<OrderDto>> findAllOrdersStatusWithStatusActive() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderUseCases.findAllOrderStatusWithActiveStatus());
     }
 
     @Operation(summary = "Atualiza o cache com as ordens que possuem status ativo")

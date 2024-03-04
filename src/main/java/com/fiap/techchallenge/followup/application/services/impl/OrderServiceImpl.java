@@ -2,8 +2,10 @@ package com.fiap.techchallenge.followup.application.services.impl;
 
 import static com.fiap.techchallenge.followup.util.ConstantsUtil.ORDER_NOT_FOUND;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,16 +38,31 @@ public class OrderServiceImpl implements OrderService {
 
     private final ObjectMapper objectMapper;
 
-    private final String ORDER_STATUS_CACHE_PREFIX_KEY = "orderStatus::";
+    private static final String ORDER_STATUS_CACHE_PREFIX_KEY = "orderStatus::";
+    private static final String ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY = "orderPaymentStatus::";
 
     @Override
-    public List<Order> findAllWithActiveStatus() {
+    public List<Order> findAllOrderStatusWithActiveStatus() {
 
         Set<String> orderStatusKeys = cachePort.getAllKeysByNamePattern(ORDER_STATUS_CACHE_PREFIX_KEY + "*");
         return cachePort.getAllDataByKeys(orderStatusKeys)
                 .stream()
                 .map(object -> objectMapper.convertValue(object, Order.class)).sorted(Comparator.comparing(Order::id))
                 .toList();
+
+    }
+
+    @Override
+    public Order findOrderOnPaymentStatusCacheById(Long orderId) {
+
+        Object orderObject = cachePort.getValueByKey(ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY + orderId);
+
+        if (orderObject == null) {
+            throw new NotFoundException(ORDER_NOT_FOUND + ". Nenhuma ordem foi encontrada no cache: "
+                    + ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY);
+        }
+
+        return objectMapper.convertValue(orderObject, Order.class);
 
     }
 
@@ -77,13 +94,21 @@ public class OrderServiceImpl implements OrderService {
 
         cachePort.clearAllCaches();
 
-        List<Status> searchedStatus = StatusEnum.getActiveStatus().stream().map(Status::new).toList();
+        List<Status> searchedStatus = StatusEnum.getActiveOrderStatus().stream().map(Status::new).toList();
         List<OrderEntity> orderEntityList = orderRepository
                 .findAllByStatusIn(searchedStatus.stream().map(Status::value).toList());
         List<Order> orderList = orderEntityList.stream().map(OrderEntity::toDomain).toList();
 
-        cachePort.setMultiKeyWithoutExpirationTime(orderList.stream().collect(
-                Collectors.toMap(order -> ORDER_STATUS_CACHE_PREFIX_KEY + order.id(), order -> order)));
+        Map<String, List<Order>> ordersGroupByStatusType = orderList.stream()
+                .collect(Collectors.groupingBy(order -> order.status().isPaymentStatus() ? "payment" : "production"));
+
+        cachePort.setMultiKeyWithoutExpirationTime(
+                ordersGroupByStatusType.getOrDefault("production", Collections.emptyList()).stream().collect(
+                        Collectors.toMap(order -> ORDER_STATUS_CACHE_PREFIX_KEY + order.id(), order -> order)));
+
+        cachePort.setMultiKeyWithoutExpirationTime(
+                ordersGroupByStatusType.getOrDefault("payment", Collections.emptyList()).stream().collect(
+                        Collectors.toMap(order -> ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY + order.id(), order -> order)));
 
     }
 
@@ -111,11 +136,29 @@ public class OrderServiceImpl implements OrderService {
 
     private void setOrderOnCache(Order resultOrder) {
 
-        if (resultOrder.status().value().equalsIgnoreCase(StatusEnum.FINALIZADO.toString())) {
-            cachePort.setKeyWithExpirationTimeInMinutes(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder,
-                    3);
+        StatusEnum status = StatusEnum.valueOfIgnoreCase(resultOrder.status().value());
+
+        if (resultOrder.status().isPaymentStatus()) {
+
+            if (status.equals(StatusEnum.PAYMENT_ACCEPTED) || status.equals(StatusEnum.PAYMENT_REFUSED)) {
+                cachePort.setKeyWithExpirationTimeInMinutes(ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY + resultOrder.id(),
+                        resultOrder,
+                        5);
+            } else {
+                cachePort.setKeyWithoutExpirationTime(ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY + resultOrder.id(),
+                        resultOrder);
+            }
+
         } else {
-            cachePort.setKeyWithoutExpirationTime(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder);
+
+            if (status.equals(StatusEnum.ORDER_DELIVERED)) {
+                cachePort.setKeyWithExpirationTimeInMinutes(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(),
+                        resultOrder,
+                        3);
+            } else {
+                cachePort.setKeyWithoutExpirationTime(ORDER_STATUS_CACHE_PREFIX_KEY + resultOrder.id(), resultOrder);
+            }
         }
+
     }
 }

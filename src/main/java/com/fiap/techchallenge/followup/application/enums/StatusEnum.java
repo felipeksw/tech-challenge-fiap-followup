@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.followup.application.enums;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -7,31 +8,59 @@ import java.util.stream.Stream;
 
 public enum StatusEnum {
 
-    RECEBIDO {
+    NEW {
         @Override
-        public StatusEnum getBeforeStatus() {
-            return RECEBIDO;
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Collections.emptySet();
         }
     },
 
-    EM_PREPARACAO {
+    PAYMENT_REQUESTED {
         @Override
-        public StatusEnum getBeforeStatus() {
-            return RECEBIDO;
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(NEW, PAYMENT_REFUSED);
         }
     },
 
-    PRONTO {
+    PAYMENT_ACCEPTED {
         @Override
-        public StatusEnum getBeforeStatus() {
-            return EM_PREPARACAO;
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(PAYMENT_REQUESTED);
         }
     },
 
-    FINALIZADO {
+    PAYMENT_REFUSED {
         @Override
-        public StatusEnum getBeforeStatus() {
-            return PRONTO;
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(PAYMENT_REQUESTED);
+        }
+    },
+
+    ORDER_RECEIVED {
+        @Override
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(PAYMENT_REFUSED);
+        }
+    },
+
+    ORDER_IN_PRODUCTION {
+        @Override
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(ORDER_RECEIVED);
+        }
+    },
+
+    ORDER_COMPLETED {
+        @Override
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(ORDER_IN_PRODUCTION);
+        }
+    },
+
+    ORDER_DELIVERED {
+        @Override
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(ORDER_COMPLETED);
         }
     };
 
@@ -44,9 +73,14 @@ public enum StatusEnum {
                 .collect(Collectors.toSet());
     }
 
-    public static List<String> getActiveStatus() {
-        Set<StatusEnum> activeStatusEnum = Set.of(RECEBIDO, EM_PREPARACAO, PRONTO);
+    public static List<String> getActiveOrderStatus() {
+        Set<StatusEnum> activeStatusEnum = Set.of(ORDER_RECEIVED, ORDER_IN_PRODUCTION, ORDER_COMPLETED);
         return activeStatusEnum.stream().map(statusEnum -> statusEnum.toString().toLowerCase()).toList();
+
+    }
+
+    public static List<StatusEnum> getOrderPaymentStatus() {
+        return List.of(NEW, PAYMENT_REQUESTED, PAYMENT_ACCEPTED, PAYMENT_REFUSED);
 
     }
 
@@ -54,6 +88,6 @@ public enum StatusEnum {
         return StatusEnum.valueOf(status.toUpperCase());
     }
 
-    public abstract StatusEnum getBeforeStatus();
+    public abstract Set<StatusEnum> getPermittedBeforeStatus();
 
 }
