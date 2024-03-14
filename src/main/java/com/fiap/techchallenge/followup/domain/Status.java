@@ -1,5 +1,7 @@
 package com.fiap.techchallenge.followup.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fiap.techchallenge.followup.application.enums.StatusEnum;
 import com.fiap.techchallenge.followup.util.StatusValidatorUtil;
 
@@ -13,10 +15,15 @@ public record Status(String value) {
         StatusEnum actualStatusEnum = StatusEnum.valueOfIgnoreCase(value);
         StatusEnum newStatusEnum = StatusEnum.valueOfIgnoreCase(newStatus.value);
 
-        if (newStatusEnum.getBeforeStatus().equals(actualStatusEnum)) {
-            return true;
-        }
+        return newStatusEnum.getPermittedBeforeStatus().contains(actualStatusEnum);
 
-        return false;
+    }
+
+    @JsonIgnore
+    public Boolean isPaymentStatus() {
+
+        StatusEnum statusEnum = StatusEnum.valueOfIgnoreCase(value);
+
+        return StatusEnum.getOrderPaymentStatus().contains(statusEnum);
     }
 }

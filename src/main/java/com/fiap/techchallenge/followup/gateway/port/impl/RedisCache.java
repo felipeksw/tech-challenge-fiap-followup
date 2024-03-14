@@ -33,6 +33,11 @@ public class RedisCache implements CachePort {
     }
 
     @Override
+    public Object getValueByKey(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    @Override
     public Set<String> getAllKeysByNamePattern(String keyNamePattern) {
         return redisTemplate.keys(keyNamePattern);
     }

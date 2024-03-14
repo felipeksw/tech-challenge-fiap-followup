@@ -46,10 +46,10 @@ public class OrderUseCasesTest {
     void when_FindAllActiveStatusAndHAveAError_Then_ThrowAException() {
 
         RuntimeException exceptionToThrow = new RuntimeException("Error during find all active status");
-        when(orderService.findAllWithActiveStatus()).thenThrow(exceptionToThrow);
+        when(orderService.findAllOrderStatusWithActiveStatus()).thenThrow(exceptionToThrow);
 
         InternalServerErrorException receivedException = assertThrowsExactly(InternalServerErrorException.class,
-                () -> orderUseCases.findAllWithActiveStatus());
+                () -> orderUseCases.findAllOrderStatusWithActiveStatus());
 
         InternalServerErrorException expectedException = new InternalServerErrorException(exceptionToThrow.getMessage(),
                 new RequestDataDto(null));
@@ -63,15 +63,15 @@ public class OrderUseCasesTest {
     @Test
     void when_FindAllActiveStatus_Then_ReturnAOrderDtoList() {
 
-        List<Order> orderListMock = List.of(new Order(1l, "recebido", LocalDate.of(2000, 1, 1)),
-                new Order(2l, "recebido", LocalDate.of(2000, 1, 1)));
+        List<Order> orderListMock = List.of(new Order(1l, "order_received", LocalDate.of(2000, 1, 1)),
+                new Order(2l, "order_received", LocalDate.of(2000, 1, 1)));
 
-        when(orderService.findAllWithActiveStatus()).thenReturn(orderListMock);
+        when(orderService.findAllOrderStatusWithActiveStatus()).thenReturn(orderListMock);
 
-        List<OrderDto> receivedOrderDtoList = orderUseCases.findAllWithActiveStatus();
+        List<OrderDto> receivedOrderDtoList = orderUseCases.findAllOrderStatusWithActiveStatus();
 
-        List<OrderDto> expectedOrderDtoList = List.of(new OrderDto(1l, "recebido", LocalDate.of(2000, 1, 1)),
-                new OrderDto(2l, "recebido", LocalDate.of(2000, 1, 1)));
+        List<OrderDto> expectedOrderDtoList = List.of(new OrderDto(1l, "order_received", LocalDate.of(2000, 1, 1)),
+                new OrderDto(2l, "order_received", LocalDate.of(2000, 1, 1)));
 
         assertEquals(expectedOrderDtoList, receivedOrderDtoList);
 
@@ -85,7 +85,7 @@ public class OrderUseCasesTest {
 
         OrderUpdateStatusResquestDto orderUpdateStatusResquestMock = OrderUpdateStatusResquestDto.builder()
                 .orderId(1l)
-                .status("recebido")
+                .status("order_received")
                 .build();
 
         ResourceNotFoundException receivedException = assertThrowsExactly(ResourceNotFoundException.class,
@@ -125,7 +125,8 @@ public class OrderUseCasesTest {
         RuntimeException exceptionToThrow = new RuntimeException("Error during the updating status");
         when(orderService.updateStatus(any(), any())).thenThrow(exceptionToThrow);
 
-        OrderUpdateStatusResquestDto orderUpdateStatusResquestMock = new OrderUpdateStatusResquestDto(1l, "recebido");
+        OrderUpdateStatusResquestDto orderUpdateStatusResquestMock = new OrderUpdateStatusResquestDto(1l,
+                "order_received");
 
         InternalServerErrorException receivedException = assertThrowsExactly(InternalServerErrorException.class,
                 () -> orderUseCases.updateStatus(orderUpdateStatusResquestMock));
@@ -143,15 +144,17 @@ public class OrderUseCasesTest {
     @Test
     void when_UpdateStatus_Then_ReturnTheOrderUpdatedReponse() {
 
-        OrderUpdateStatusResquestDto orderUpdateStatusResquestMock = new OrderUpdateStatusResquestDto(1l, "pronto");
-        Order orderUpdatedMock = new Order(1l, "pronto", LocalDate.of(2000, 1, 1));
+        OrderUpdateStatusResquestDto orderUpdateStatusResquestMock = new OrderUpdateStatusResquestDto(1l,
+                "order_completed");
+        Order orderUpdatedMock = new Order(1l, "order_completed", LocalDate.of(2000, 1, 1));
 
-        when(orderService.updateStatus(1l, new Status("pronto"))).thenReturn(orderUpdatedMock);
+        when(orderService.updateStatus(1l, new Status("order_completed"))).thenReturn(orderUpdatedMock);
 
         OrderUpdateStatusResponseDto receivedOrderUpdatedResponse = orderUseCases
                 .updateStatus(orderUpdateStatusResquestMock);
 
-        OrderUpdateStatusResponseDto expectedOrderUpdatedResponse = new OrderUpdateStatusResponseDto(1l, "pronto",
+        OrderUpdateStatusResponseDto expectedOrderUpdatedResponse = new OrderUpdateStatusResponseDto(1l,
+                "order_completed",
                 "order status updated");
 
         assertEquals(expectedOrderUpdatedResponse, receivedOrderUpdatedResponse);
@@ -222,14 +225,14 @@ public class OrderUseCasesTest {
     @Test
     void when_SyncedAOrderStatus_Then_ReturnTheOrderDtoSynced() {
 
-        Order orderSyncedMock = new Order(1l, "pronto", LocalDate.of(2000, 1, 1));
+        Order orderSyncedMock = new Order(1l, "order_completed", LocalDate.of(2000, 1, 1));
 
         when(orderService.syncOrderToOrderStatusCache(anyLong())).thenReturn(orderSyncedMock);
 
         OrderDto receivedSyncedOrderDto = orderUseCases
                 .syncOrderToOrderStatusCache(1l);
 
-        OrderDto expectedSyncedOrderDto = new OrderDto(1l, "pronto", LocalDate.of(2000, 1, 1));
+        OrderDto expectedSyncedOrderDto = new OrderDto(1l, "order_completed", LocalDate.of(2000, 1, 1));
 
         assertEquals(expectedSyncedOrderDto, receivedSyncedOrderDto);
     }

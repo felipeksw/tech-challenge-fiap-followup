@@ -26,12 +26,23 @@ public class OrderUseCases {
 
     private final OrderService orderService;
 
-    public List<OrderDto> findAllWithActiveStatus() {
+    public List<OrderDto> findAllOrderStatusWithActiveStatus() {
         try {
-            List<Order> orders = orderService.findAllWithActiveStatus();
+            List<Order> orders = orderService.findAllOrderStatusWithActiveStatus();
             return orders.stream().map(OrderDto::of).toList();
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(null));
+        }
+    }
+
+    public OrderDto findOrderOnPaymentStatusCacheById(Long orderId) {
+        try {
+            Order order = orderService.findOrderOnPaymentStatusCacheById(orderId);
+            return OrderDto.of(order);
+        } catch (NotFoundException e) {
+            throw new ResourceNotFoundException(e.getMessage(), new RequestDataDto(Map.of("orderId", orderId)));
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(Map.of("orderId", orderId)));
         }
     }
 

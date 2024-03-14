@@ -7,7 +7,9 @@ import com.fiap.techchallenge.followup.domain.Status;
 
 public interface OrderService {
 
-    List<Order> findAllWithActiveStatus();
+    List<Order> findAllOrderStatusWithActiveStatus();
+
+    Order findOrderOnPaymentStatusCacheById(Long orderId);
 
     Order updateStatus(Long orderId, Status newStatus);
 

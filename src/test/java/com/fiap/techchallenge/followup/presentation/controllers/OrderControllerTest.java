@@ -39,7 +39,7 @@ class OrderControllerTest {
     void when_GetAllActiveStatusAndHaveAInternalError_Then_ReturnStatusInternalErrorAndMessage() throws Exception {
         InternalServerErrorException exceptionToBeThrow = new InternalServerErrorException(
                 "Error during find all active status", new RequestDataDto(null));
-        when(orderUseCases.findAllWithActiveStatus()).thenThrow(exceptionToBeThrow);
+        when(orderUseCases.findAllOrderStatusWithActiveStatus()).thenThrow(exceptionToBeThrow);
 
         ErrorResponseDto expectedResult = new ErrorResponseDto(null, exceptionToBeThrow.getMessage());
 

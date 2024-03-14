@@ -10,6 +10,8 @@ public interface CachePort {
 
     Set<String> getAllKeysByNamePattern(String keyNamePattern);
 
+    Object getValueByKey(String key);
+
     List<Object> getAllDataByKeys(Set<String> keys);
 
     void setKeyWithExpirationTimeInMinutes(String key, Object value, Integer timeExpiration);
