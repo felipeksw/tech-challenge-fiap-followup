@@ -68,15 +68,4 @@ public class OrderUseCases {
         }
     }
 
-    public OrderDto syncOrderToOrderStatusCache(Long orderId) {
-        try {
-            Order order = orderService.syncOrderToOrderStatusCache(orderId);
-            return OrderDto.of(order);
-        } catch (NotFoundException e) {
-            throw new ResourceNotFoundException(e.getMessage(), new RequestDataDto(Map.of("orderId", orderId)));
-        } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage(), new RequestDataDto(Map.of("orderId", orderId)));
-        }
-    }
-
 }
