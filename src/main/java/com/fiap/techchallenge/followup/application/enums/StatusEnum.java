@@ -39,7 +39,7 @@ public enum StatusEnum {
     ORDER_RECEIVED {
         @Override
         public Set<StatusEnum> getPermittedBeforeStatus() {
-            return Set.of(PAYMENT_REQUESTED);
+            return Set.of(PAYMENT_ACCEPTED);
         }
     },
 
