@@ -1,7 +1,6 @@
 package com.fiap.techchallenge.followup.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fiap.techchallenge.followup.application.enums.StatusEnum;
 import com.fiap.techchallenge.followup.util.StatusValidatorUtil;
 

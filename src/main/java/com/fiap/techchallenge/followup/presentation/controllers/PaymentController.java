@@ -30,15 +30,15 @@ public class PaymentController {
 
     private final OrderUseCases orderUseCases;
 
-    @Operation(summary = "Atualizar status da ordem")
+    @Operation(summary = "Recupera um status de pagamento do cache de pagamento")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status de pagamento encontrado", content = {
+            @ApiResponse(responseCode = "200", description = "Status de pagamento encontrado no cache", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))
             }),
             @ApiResponse(responseCode = "404", description = "Nenhum pedido encontrado", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
             }),
-            @ApiResponse(responseCode = "500", description = "Problemas internos durante a busca por pelo status de pagamento do pedido", content = {
+            @ApiResponse(responseCode = "500", description = "Problemas internos durante a busca pelo status de pagamento do pedido", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
             })
     })

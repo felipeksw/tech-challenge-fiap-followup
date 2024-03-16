@@ -37,28 +37,6 @@ public class OrderController {
 
     private final OrderUseCases orderUseCases;
 
-    @Operation(summary = "Atualizar status da ordem")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Status atualizado", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderUpdateStatusResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Nenhum pedido encontrado", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para a atualização do status", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "500", description = "Problemas internos durante a a atualização do status", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
-            })
-    })
-    @PutMapping
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<OrderUpdateStatusResponseDto> updateOrderStatus(
-            @RequestBody OrderUpdateStatusResquestDto updateStatusRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderUseCases.updateStatus(updateStatusRequest));
-    }
-
     @Operation(summary = "Recuperar todas as ordens ativas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Status atualizado", content = {
@@ -90,21 +68,4 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Operation(summary = "Sincroniza a ordem no banco de dados com o cache a partir do id passado")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ordem sincronizada com o cache", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = OrderDto.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Nenhum pedido encontrado", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
-            }),
-            @ApiResponse(responseCode = "500", description = "Problemas internos durante a sincronização da ordem", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))
-            })
-    })
-    @PostMapping(value = "/{orderId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<OrderDto> syncOrderToOrderStatusCache(@PathVariable Long orderId) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderUseCases.syncOrderToOrderStatusCache(orderId));
-    }
 }
