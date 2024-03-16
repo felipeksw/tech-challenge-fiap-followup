@@ -2,6 +2,7 @@ package com.fiap.techchallenge.followup.application.services.impl;
 
 import static com.fiap.techchallenge.followup.util.ConstantsUtil.ORDER_NOT_FOUND;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -94,9 +95,11 @@ public class OrderServiceImpl implements OrderService {
 
         cachePort.clearAllCaches();
 
-        List<Status> searchedStatus = StatusEnum.getActiveOrderStatus().stream().map(Status::new).toList();
-        List<OrderEntity> orderEntityList = orderRepository
-                .findAllByStatusIn(searchedStatus.stream().map(Status::value).toList());
+        List<String> searchedStatus = Arrays.stream(StatusEnum.values())
+                .map(statusEnum -> statusEnum.name().toLowerCase()).toList();
+
+        List<OrderEntity> orderEntityList = orderRepository.findAllByStatusIn(searchedStatus);
+
         List<Order> orderList = orderEntityList.stream().map(OrderEntity::toDomain).toList();
 
         Map<String, List<Order>> ordersGroupByStatusType = orderList.stream()
@@ -109,19 +112,6 @@ public class OrderServiceImpl implements OrderService {
         cachePort.setMultiKeyWithoutExpirationTime(
                 ordersGroupByStatusType.getOrDefault("payment", Collections.emptyList()).stream().collect(
                         Collectors.toMap(order -> ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY + order.id(), order -> order)));
-
-    }
-
-    @Override
-    public Order syncOrderToOrderStatusCache(Long orderId) {
-
-        OrderEntity orderEntity = findOrderEntityById(orderId);
-
-        Order orderToSync = orderEntity.toDomain();
-
-        setOrderOnCache(orderToSync);
-
-        return orderToSync;
 
     }
 
