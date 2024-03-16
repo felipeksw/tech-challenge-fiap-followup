@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.followup.application.services.impl;
 
+import static com.fiap.techchallenge.followup.application.enums.StatusEnum.PAYMENT_ACCEPTED;
 import static com.fiap.techchallenge.followup.util.ConstantsUtil.ORDER_NOT_FOUND;
 
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import com.fiap.techchallenge.followup.domain.Status;
 import com.fiap.techchallenge.followup.domain.exceptions.InvalidDataException;
 import com.fiap.techchallenge.followup.domain.exceptions.NotFoundException;
 import com.fiap.techchallenge.followup.gateway.entity.OrderEntity;
+import com.fiap.techchallenge.followup.gateway.port.AsynchronousRequestPort;
 import com.fiap.techchallenge.followup.gateway.port.CachePort;
 import com.fiap.techchallenge.followup.gateway.repository.OrderRepository;
 
@@ -34,10 +36,9 @@ import lombok.RequiredArgsConstructor;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-
     private final CachePort cachePort;
-
     private final ObjectMapper objectMapper;
+    private final AsynchronousRequestPort asynchronousRequestPort;
 
     private static final String ORDER_STATUS_CACHE_PREFIX_KEY = "orderStatus::";
     private static final String ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY = "orderPaymentStatus::";
@@ -86,6 +87,11 @@ public class OrderServiceImpl implements OrderService {
 
         setOrderOnCache(resultOrder);
 
+        // Sinaliza que o pedido deve entrar em producao, pois o pagamento esta completo
+        if (resultOrder.status().equalsStatusEnum(PAYMENT_ACCEPTED)) {
+            asynchronousRequestPort.signalPaymentCompleted(orderId);
+        }
+
         return resultOrder;
     }
 
@@ -130,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (resultOrder.status().isPaymentStatus()) {
 
-            if (status.equals(StatusEnum.PAYMENT_ACCEPTED) || status.equals(StatusEnum.PAYMENT_REFUSED)) {
+            if (status.equals(PAYMENT_ACCEPTED) || status.equals(StatusEnum.PAYMENT_REFUSED)) {
                 cachePort.setKeyWithExpirationTimeInMinutes(ORDER_PAYMENT_STATUS_CACHE_PREFIX_KEY + resultOrder.id(),
                         resultOrder,
                         5);

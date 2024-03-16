@@ -10,10 +10,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.techchallenge.followup.application.enums.StatusEnum;
 import com.fiap.techchallenge.followup.application.useCases.OrderUseCases;
 import com.fiap.techchallenge.followup.domain.exceptions.BaseHttpException;
+import com.fiap.techchallenge.followup.gateway.port.AsynchronousRequestPort;
 import com.fiap.techchallenge.followup.presentation.dtos.ErrorConsumerDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderPaymentConsumerDto;
 import com.fiap.techchallenge.followup.presentation.dtos.OrderUpdateStatusResquestDto;
-import com.fiap.techchallenge.followup.presentation.producers.GenericProducer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class PaymentRequestedConsumer {
 
     private final ObjectMapper objectMapper;
     private final OrderUseCases orderUseCases;
-    private final GenericProducer genericProducer;
+    private final AsynchronousRequestPort asynchronousRequestPort;
 
     @Value("${kafka.topic.payment-requested.dl}")
     private String paymentRequestDlTopic;
@@ -47,7 +47,7 @@ public class PaymentRequestedConsumer {
                     .errorDetail(e.getMessage())
                     .rawData(message)
                     .build();
-            genericProducer.send(paymentRequestDlTopic, errorConsumer);
+            asynchronousRequestPort.sendPaymentRequestedDl(errorConsumer);
         } catch (Exception e) {
             log.error("Erro processing the message {} on the {}: {} ", message, this.getClass().getSimpleName(),
                     e.getMessage());
