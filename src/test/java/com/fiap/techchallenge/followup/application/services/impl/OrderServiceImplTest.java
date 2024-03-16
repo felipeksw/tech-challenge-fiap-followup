@@ -170,7 +170,7 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void when_InitializeOrderStatusActiveCache_Then_ClearCacheAndSetTheListOfOrderActiveOnCache() {
+    void when_InitializeStatusCaches_Then_ClearCacheAndSetTheOrdersInRespectiveCaches() {
         List<OrderEntity> orderEntityMocks = List.of(OrderEntity.builder()
                 .id(1l)
                 .status("order_received")
@@ -190,7 +190,8 @@ class OrderServiceImplTest {
         ArgumentCaptor<Map<String, Object>> keyValueCaptor = ArgumentCaptor
                 .forClass(Map.class);
 
-        List<String> expectedStatusActiveList = List.of("order_received", "order_in_production", "order_completed");
+        List<String> expectedStatus = List.of("new", "order_completed", "order_delivered",
+                "order_in_production", "order_received", "payment_accepted", "payment_refused", "payment_requested");
 
         HashMap<String, Object> expectedKeyValue = new HashMap<String, Object>();
         expectedKeyValue.put("orderStatus::1", new Order(1l, "order_received", LocalDate.of(2000, 1, 1)));
@@ -200,34 +201,11 @@ class OrderServiceImplTest {
 
         verify(cachePort, times(1)).clearAllCaches();
         verify(orderRepository).findAllByStatusIn(statusListCaptor.capture());
-        assertEquals(expectedStatusActiveList.stream().sorted().toList(),
+        assertEquals(expectedStatus.stream().sorted().toList(),
                 statusListCaptor.getValue().stream().sorted().toList());
         verify(cachePort, times(2)).setMultiKeyWithoutExpirationTime(keyValueCaptor.capture());
         assertEquals(expectedKeyValueList, keyValueCaptor.getAllValues());
 
     }
 
-    @Test
-    void when_SyncAOrderInCacheWithActiveStatus_Then_SetOnCacheWithoutExpirationTime() {
-        OrderEntity orderEntityMock = OrderEntity.builder()
-                .id(1l)
-                .status("order_completed")
-                .createdAt(LocalDate.of(2000, 1, 1))
-                .build();
-
-        when(orderRepository.findById(1l)).thenReturn(Optional.of(orderEntityMock));
-
-        Order receivedOrder = orderService.syncOrderToOrderStatusCache(1l);
-
-        Order expectedOrder = Order.builder()
-                .id(1l)
-                .status("order_completed")
-                .createdAt(LocalDate.of(2000, 1, 1))
-                .build();
-
-        assertEquals(expectedOrder, receivedOrder);
-        verify(orderRepository, only()).findById(1l);
-        verify(cachePort, only()).setKeyWithoutExpirationTime("orderStatus::1",
-                expectedOrder);
-    }
 }

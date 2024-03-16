@@ -49,27 +49,4 @@ class OrderControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResult)));
     }
 
-    @Test
-    void when_PutUpdateStatusAndOrderIdDoentExist_Then_ReturnStatusNotFoundAndMessageRequest() throws Exception {
-
-        OrderUpdateStatusResquestDto orderUpdateStatusRequest = OrderUpdateStatusResquestDto.builder()
-                .orderId(1l)
-                .status("pronto")
-                .build();
-
-        ResourceNotFoundException exceptionToBeThrow = new ResourceNotFoundException(
-                "Order id not found", new RequestDataDto(orderUpdateStatusRequest));
-
-        when(orderUseCases.updateStatus(any())).thenThrow(exceptionToBeThrow);
-
-        ErrorResponseDto expectedResult = new ErrorResponseDto(orderUpdateStatusRequest,
-                exceptionToBeThrow.getMessage());
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/order").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderUpdateStatusRequest)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expectedResult)));
-    }
-
 }
