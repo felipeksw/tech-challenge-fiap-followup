@@ -1,5 +1,8 @@
 package com.fiap.techchallenge.followup.gateway.port.impl;
 
+import java.util.Map;
+
+import org.checkerframework.checker.units.qual.K;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,9 @@ public class KafkaAsynchronousRequest implements AsynchronousRequestPort {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
+
+    @Value("${kafka.topic.payment-completed}")
+    private String paymentCompletedTopic;
 
     @Value("${kafka.topic.order-status.dl}")
     private String orderStatusDlTopic;
@@ -42,8 +48,9 @@ public class KafkaAsynchronousRequest implements AsynchronousRequestPort {
 
     @Override
     public void signalPaymentCompleted(Long orderId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'signalPaymentCompleted'");
+        Map<String, Long> orderIdWithPaymentCompleted = Map.of("orderId", orderId);
+        send(paymentCompletedTopic, orderIdWithPaymentCompleted);
+
     }
 
     @Override

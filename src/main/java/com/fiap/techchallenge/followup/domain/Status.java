@@ -25,4 +25,12 @@ public record Status(String value) {
 
         return StatusEnum.getOrderPaymentStatus().contains(statusEnum);
     }
+
+    @JsonIgnore
+    public Boolean equalsStatusEnum(StatusEnum statusEnum) {
+
+        StatusEnum currentlyStatusEnum = StatusEnum.valueOfIgnoreCase(value);
+
+        return currentlyStatusEnum.equals(statusEnum);
+    }
 }
