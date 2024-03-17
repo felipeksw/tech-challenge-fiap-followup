@@ -8,6 +8,8 @@ public interface AsynchronousRequestPort {
 
     <T> void sendStatusDl(ErrorConsumerDto<T> errorConsumerDto);
 
+    <T> void sendPaymentPendingDl(ErrorConsumerDto<T> errorConsumerDto);
+
     <T> void sendPaymentRequestedDl(ErrorConsumerDto<T> errorConsumerDto);
 
     <T> void sendPaymentRefusedDl(ErrorConsumerDto<T> errorConsumerDto);
