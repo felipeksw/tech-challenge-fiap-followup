@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ class OrderServiceImplTest {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
                 .status("order_received")
-                .createdAt(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         when(orderRepository.findById(1l)).thenReturn(Optional.of(orderEntityMock));
@@ -104,7 +105,7 @@ class OrderServiceImplTest {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
                 .status("order_completed")
-                .createdAt(LocalDate.of(2000, 1, 1))
+                .createdAt(LocalDateTime.of(2000, 1, 1, 2, 2))
                 .build();
 
         when(orderRepository.findById(1l)).thenReturn(Optional.of(orderEntityMock));
@@ -133,7 +134,7 @@ class OrderServiceImplTest {
         OrderEntity orderEntityMock = OrderEntity.builder()
                 .id(1l)
                 .status("order_received")
-                .createdAt(LocalDate.of(2000, 1, 1))
+                .createdAt(LocalDateTime.of(2000, 1, 1, 2, 2))
                 .client("Felipe")
                 .customerId(1l)
                 .paymentMethod("Cartao")
@@ -174,12 +175,12 @@ class OrderServiceImplTest {
         List<OrderEntity> orderEntityMocks = List.of(OrderEntity.builder()
                 .id(1l)
                 .status("order_received")
-                .createdAt(LocalDate.of(2000, 1, 1))
+                .createdAt(LocalDateTime.of(2000, 1, 1, 2, 2))
                 .build(),
                 OrderEntity.builder()
                         .id(2l)
                         .status("order_in_production")
-                        .createdAt(LocalDate.of(2000, 1, 2))
+                        .createdAt(LocalDateTime.of(2000, 1, 2, 2, 2))
                         .build());
 
         when(orderRepository.findAllByStatusIn(any())).thenReturn(orderEntityMocks);
@@ -191,7 +192,8 @@ class OrderServiceImplTest {
                 .forClass(Map.class);
 
         List<String> expectedStatus = List.of("new", "order_completed", "order_delivered",
-                "order_in_production", "order_received", "payment_accepted", "payment_refused", "payment_requested");
+                "order_in_production", "order_received", "payment_accepted", "payment_refused", "payment_requested",
+                "payment_pending");
 
         HashMap<String, Object> expectedKeyValue = new HashMap<String, Object>();
         expectedKeyValue.put("orderStatus::1", new Order(1l, "order_received", LocalDate.of(2000, 1, 1)));

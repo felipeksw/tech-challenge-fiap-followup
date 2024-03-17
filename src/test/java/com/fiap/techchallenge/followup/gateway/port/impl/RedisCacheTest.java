@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,7 @@ class RedisCacheTest {
         orderEntity.setPaymentMethod("Cartao");
         orderEntity.setOrderItems(List.of());
         orderEntity.setCustomerId(1l);
-        orderEntity.setCreatedAt(LocalDate.now());
+        orderEntity.setCreatedAt(LocalDateTime.now());
 
         return orderEntity;
 

@@ -28,6 +28,9 @@ public class KafkaAsynchronousRequest implements AsynchronousRequestPort {
     @Value("${kafka.topic.order-status.dl}")
     private String orderStatusDlTopic;
 
+    @Value("${kafka.topic.payment-pending.dl}")
+    private String paymentPendingDlTopic;
+
     @Value("${kafka.topic.payment-accepted.dl}")
     private String paymentAcceptedDlTopic;
 
@@ -56,6 +59,11 @@ public class KafkaAsynchronousRequest implements AsynchronousRequestPort {
     @Override
     public <T> void sendStatusDl(ErrorConsumerDto<T> errorConsumerDto) {
         send(orderStatusDlTopic, errorConsumerDto);
+    }
+
+    @Override
+    public <T> void sendPaymentPendingDl(ErrorConsumerDto<T> errorConsumerDto) {
+        send(paymentPendingDlTopic, errorConsumerDto);
     }
 
     @Override

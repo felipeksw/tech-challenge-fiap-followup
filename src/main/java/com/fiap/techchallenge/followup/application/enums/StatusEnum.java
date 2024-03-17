@@ -22,17 +22,24 @@ public enum StatusEnum {
         }
     },
 
-    PAYMENT_ACCEPTED {
+    PAYMENT_PENDING {
         @Override
         public Set<StatusEnum> getPermittedBeforeStatus() {
             return Set.of(PAYMENT_REQUESTED);
         }
     },
 
+    PAYMENT_ACCEPTED {
+        @Override
+        public Set<StatusEnum> getPermittedBeforeStatus() {
+            return Set.of(PAYMENT_REQUESTED, PAYMENT_PENDING);
+        }
+    },
+
     PAYMENT_REFUSED {
         @Override
         public Set<StatusEnum> getPermittedBeforeStatus() {
-            return Set.of(PAYMENT_REQUESTED);
+            return Set.of(PAYMENT_REQUESTED, PAYMENT_PENDING);
         }
     },
 
