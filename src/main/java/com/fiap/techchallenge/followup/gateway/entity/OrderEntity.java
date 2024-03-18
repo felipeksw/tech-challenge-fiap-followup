@@ -64,7 +64,7 @@ public class OrderEntity {
         return Order.builder()
                 .id(this.id)
                 .status(this.status)
-                .createdAt(createdAt.toLocalDate())
+                .createdAt(createdAt)
                 .build();
     }
 

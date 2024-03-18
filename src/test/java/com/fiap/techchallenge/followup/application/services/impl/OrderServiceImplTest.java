@@ -55,10 +55,10 @@ class OrderServiceImplTest {
 
     @Test
     void when_FindAllOrderStatusActive_Then_ReturnListOfAllStatus() {
-        List<Object> orderMockList = List.of(new Order(1l, "order_received", LocalDate.now()),
-                new Order(2l, "order_in_production", LocalDate.now()),
-                new Order(3l, "order_completed", LocalDate.now()),
-                new Order(4l, "order_delivered", LocalDate.now()));
+        List<Object> orderMockList = List.of(new Order(1l, "order_received", LocalDateTime.now()),
+                new Order(2l, "order_in_production", LocalDateTime.now()),
+                new Order(3l, "order_completed", LocalDateTime.now()),
+                new Order(4l, "order_delivered", LocalDateTime.now()));
         when(cachePort.getAllKeysByNamePattern(any())).thenReturn(Set.of("1"));
         when(cachePort.getAllDataByKeys(any())).thenReturn(orderMockList);
 
@@ -119,7 +119,7 @@ class OrderServiceImplTest {
         Order expectedOrder = Order.builder()
                 .id(1l)
                 .status("order_delivered")
-                .createdAt(LocalDate.of(2000, 1, 1))
+                .createdAt(LocalDateTime.of(2000, 1, 1, 2, 2))
                 .build();
 
         assertEquals(expectedOrder, receivedOrder);
@@ -159,7 +159,7 @@ class OrderServiceImplTest {
         Order expectedOrder = Order.builder()
                 .id(1l)
                 .status("order_in_production")
-                .createdAt(LocalDate.of(2000, 1, 1))
+                .createdAt(LocalDateTime.of(2000, 1, 1, 2, 2))
                 .build();
 
         assertEquals(expectedOrder, receivedOrder);
@@ -196,8 +196,9 @@ class OrderServiceImplTest {
                 "payment_pending");
 
         HashMap<String, Object> expectedKeyValue = new HashMap<String, Object>();
-        expectedKeyValue.put("orderStatus::1", new Order(1l, "order_received", LocalDate.of(2000, 1, 1)));
-        expectedKeyValue.put("orderStatus::2", new Order(2l, "order_in_production", LocalDate.of(2000, 1, 2)));
+        expectedKeyValue.put("orderStatus::1", new Order(1l, "order_received", LocalDateTime.of(2000, 1, 1, 2, 2)));
+        expectedKeyValue.put("orderStatus::2",
+                new Order(2l, "order_in_production", LocalDateTime.of(2000, 1, 2, 2, 2)));
         List<HashMap<String, Object>> expectedKeyValueList = List.of(expectedKeyValue, new HashMap<String, Object>());
         orderService.initializeOrderActiveStatusCache();
 
