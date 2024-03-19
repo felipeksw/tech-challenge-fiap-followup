@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -63,15 +64,16 @@ public class OrderUseCasesTest {
     @Test
     void when_FindAllActiveStatus_Then_ReturnAOrderDtoList() {
 
-        List<Order> orderListMock = List.of(new Order(1l, "order_received", LocalDate.of(2000, 1, 1)),
-                new Order(2l, "order_received", LocalDate.of(2000, 1, 1)));
+        List<Order> orderListMock = List.of(new Order(1l, "order_received", LocalDateTime.of(2000, 1, 1, 2, 2)),
+                new Order(2l, "order_received", LocalDateTime.of(2000, 1, 1, 2, 2)));
 
         when(orderService.findAllOrderStatusWithActiveStatus()).thenReturn(orderListMock);
 
         List<OrderDto> receivedOrderDtoList = orderUseCases.findAllOrderStatusWithActiveStatus();
 
-        List<OrderDto> expectedOrderDtoList = List.of(new OrderDto(1l, "order_received", LocalDate.of(2000, 1, 1)),
-                new OrderDto(2l, "order_received", LocalDate.of(2000, 1, 1)));
+        List<OrderDto> expectedOrderDtoList = List.of(
+                new OrderDto(1l, "order_received", LocalDateTime.of(2000, 1, 1, 2, 2)),
+                new OrderDto(2l, "order_received", LocalDateTime.of(2000, 1, 1, 2, 2)));
 
         assertEquals(expectedOrderDtoList, receivedOrderDtoList);
 
@@ -146,7 +148,7 @@ public class OrderUseCasesTest {
 
         OrderUpdateStatusResquestDto orderUpdateStatusResquestMock = new OrderUpdateStatusResquestDto(1l,
                 "order_completed");
-        Order orderUpdatedMock = new Order(1l, "order_completed", LocalDate.of(2000, 1, 1));
+        Order orderUpdatedMock = new Order(1l, "order_completed", LocalDateTime.of(2000, 1, 1, 2, 2));
 
         when(orderService.updateStatus(1l, new Status("order_completed"))).thenReturn(orderUpdatedMock);
 

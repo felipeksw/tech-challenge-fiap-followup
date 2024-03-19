@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.followup.presentation.dtos;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fiap.techchallenge.followup.domain.Order;
 
@@ -17,7 +18,7 @@ public class OrderDto {
 
     private long orderId;
     private String status;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     public static OrderDto of(Order order) {
         return OrderDto.builder()

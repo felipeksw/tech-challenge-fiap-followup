@@ -24,9 +24,9 @@ jobs:
       run: |
         if [[ ${{env.BRANCH_NAME}} == 'main' ]]
         then
-          DOCKER_TAG="latest-${{ github.sha }}"
+          DOCKER_TAG="latest"
         else
-          DOCKER_TAG="${{env.BRANCH_NAME}}-latest-${{ github.sha }}"
+          DOCKER_TAG="${{env.BRANCH_NAME}}"
         fi
         echo "DOCKER_TAG=${DOCKER_TAG}" >> $GITHUB_ENV
 
