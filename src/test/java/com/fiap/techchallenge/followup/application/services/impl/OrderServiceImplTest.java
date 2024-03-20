@@ -136,7 +136,7 @@ class OrderServiceImplTest {
                 .status("order_received")
                 .createdAt(LocalDateTime.of(2000, 1, 1, 2, 2))
                 .client("Felipe")
-                .customerId(1l)
+                .customerId("9e79e928bd9e")
                 .paymentMethod("Cartao")
                 .price(BigDecimal.TEN)
                 .orderItems(List.of(OrderItemsEntity.builder()

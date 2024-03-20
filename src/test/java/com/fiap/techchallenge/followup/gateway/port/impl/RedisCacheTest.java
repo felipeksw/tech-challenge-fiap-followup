@@ -125,7 +125,7 @@ class RedisCacheTest {
         orderEntity.setStatus("recebido");
         orderEntity.setPaymentMethod("Cartao");
         orderEntity.setOrderItems(List.of());
-        orderEntity.setCustomerId(1l);
+        orderEntity.setCustomerId("9e79e928bd9e");
         orderEntity.setCreatedAt(LocalDateTime.now());
 
         return orderEntity;

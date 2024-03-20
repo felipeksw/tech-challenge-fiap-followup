@@ -42,7 +42,7 @@ public class OrderEntity {
     private String client;
 
     @Column(name = "customer_id", columnDefinition = "varchar(255) DEFAULT NULL")
-    private Long customerId;
+    private String customerId;
 
     @Column(name = "payment_method", nullable = false, columnDefinition = "varchar(255) NOT NULL")
     private String paymentMethod;
